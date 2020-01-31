@@ -21,9 +21,9 @@ public class DBConnector {
 	private Connection conn;
 	private AESDec aes;
 	
-	private String dbURL = "jdbc:mariadb://localhost:8080/iot?serverTimezone=UTC";
+	private String dbURL = "jdbc:mariadb://localhost:3306/iot?serverTimezone=UTC";
 	private String dbID = "testid";
-	private String dbPassword = "";
+	private String dbPassword = "1q2w3e4r!!";
 	
 	public DBConnector() {
 		try {

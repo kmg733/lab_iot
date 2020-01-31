@@ -3,8 +3,9 @@
 <%@ page import = "DBConnect.*"%>
 <%
 		request.setCharacterEncoding("UTF-8");
-		String name = request.getParameter("name");
-		String id = request.getParameter("id");
+		String name = request.getParameter("names");
+		String id = request.getParameter("ids");
+		String pwd = request.getParameter("pwds");
 		String b_name = request.getParameter("b_name");
 		String b_id = request.getParameter("b_id");
 		String type = request.getParameter("type");	//	사용자구 무슨요청을 했는지 구분하는 변수
@@ -18,7 +19,7 @@
 			out.flush();
 		}
 		else if(type.equals("userAdd")) {
-			String returns = user.userAdd(name, id);	//추가할 이름, 추가할 아이디
+			String returns = user.userAdd(id, name, pwd);	//추가할 이름, 추가할 아이디
 			out.clear();
 			out.print(returns);
 			out.flush();			
@@ -30,7 +31,7 @@
 			out.flush();
 		}
 		else if(type.equals("userDelete")) {
-			String returns = user.userDelete(name, id);	//삭제할 이름, 삭제할 아이디, 삭제할 핀
+			String returns = user.userDelete(name, id);	//삭제할 이름, 삭제할 아이디
 			out.clear();
 			out.print(returns);
 			out.flush();

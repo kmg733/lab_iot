@@ -18,8 +18,10 @@ public class UserInfo {
 	private Connection conn;	//	db에 접근하게 해주는 객체
 	private String sql = ""; 	//	쿼리1(MariaDB에 들어갈 명령어지문)
 	private String sql2 = "";
+	private String sql3 = "";
 	private PreparedStatement pstmt;		//	db에 sql문을 전달해주는 객체
 	private PreparedStatement pstmt2;
+	private PreparedStatement pstmt3;
 	private ResultSet rs;	//	db에서 쿼리의 실행결과를 가져오는 객체
 	private StringBuilder returnb;
 	private String returns; //메소드 성공 여부 반환
@@ -52,30 +54,39 @@ public class UserInfo {
 		return returns;
 	}
 	
-	public String userAdd(String name, String id) {	//	회원 등록
+	public String userAdd( String id, String name, String pwd) {	//	회원 등록
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
-			sql = "select * from user where name=? and id=?"; 	//	user 테이블에 회원정보 넣기
+			sql = "select * from add_user where id=?"; 	//	user 테이블에 회원정보 넣기
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, name);
-			pstmt.setString(2, id);
+			pstmt.setString(1, id);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
-			if(rs.next()) {	//	이미 해당회원정보가 존재 할 때
-				returns = "userAlreadExist";
+			if(rs.next()) {	//	add-user테이블에 id가 존재할 때
+				sql2 = "select * from user where id=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setString(1, id);
+				rs = pstmt2.executeQuery();
+				if(rs.next()) {
+					returns = "userAlreadExist";
+				}
+				else {
+					sql3 = "insert into user (id, password, name) values (?, ?, ?)"; 	//	user 테이블에 회원정보 넣기
+					pstmt3 = conn.prepareStatement(sql3);
+					pstmt3.setString(1, id);
+					pstmt3.setString(2, pwd);
+					pstmt3.setString(3, name);
+					pstmt3.executeUpdate();	//	db에 쿼리문 입력		
+					returns = "userAddSuccess";
+				}
 			}
 			else {	//	해당 회원정보가 존재하지 않을 때
-				sql2 = "insert into user (id, name) values (?, ?)"; 	//	user 테이블에 회원정보 넣기
-				pstmt2 = conn.prepareStatement(sql);
-				pstmt2.setString(1, id);
-				pstmt2.setString(2, name);
-				pstmt2.executeUpdate();	//	db에 쿼리문 입력		
-				returns = "userAddSuccess";
+				returns = "IDnotExist";
 			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-			returns = "error";
+			returns = ""+e;
 		}
 		finally {
 			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
