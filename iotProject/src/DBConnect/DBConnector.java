@@ -15,40 +15,39 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import utill.AESDec;
+import util.AESDec;
 
 public class DBConnector {
 	private Connection conn;
 	private AESDec aes;
 	
-	private String dbURL = "jdbc:mariadb://localhost:3306/iot?serverTimezone=UTC";
-	private String dbID = "testid";
-	private String dbPassword = "1q2w3e4r!!";
+	private String dbURL = "jdbc:mariadb://localhost:3306/iot?serverTimezone=UTC";	//	db주소
+	private String dbID = "testid";	//	db아이디
+	private String dbPassword = "security915!";	//	db비밀번호
 	
 	public DBConnector() {
+		/*
 		try {
-			//내부 암호화된 DB password read
+			//암호화된 DB password read
 				String propFile = "E:\\eclipse\\iotProject\\src\\util\\key.properties";		
 	      		Properties props = new Properties();
 	      		FileInputStream fis = new FileInputStream(propFile);	         
 	       		props.load(new java.io.BufferedInputStream(fis));			
-
-			//외부에 저장된 비밀키 read
-	       		String read_key = "E:\\eclipse\\jar파일모음\\key_management\\keymanagement.properties";
+	       		
+			//암호화에 사용할 키 read
+	       		String read_key = "E:\\eclipse\\jar files\\key_management\\keymanagement.properties";
 	        	Properties key = new Properties();	        
 	       		FileInputStream key_fis = new FileInputStream(read_key);
 	       		key.load(new java.io.BufferedInputStream(key_fis));
-	        
-	       		 String aes_key = key.getProperty("key");
-	       		 if(aes_key !=null) {
-	        		aes = new AESDec(aes_key);	//암호화된 코드
+	       		
+	       		String aes_key = key.getProperty("key");
+	       		if(aes_key !=null) {
+	        		aes = new AESDec(aes_key);	//암호화에 사용할 키 전달 
 	    		}	  
-	        
-			String dbPassword = "";
-			
-			if(aes != null)
-				dbPassword = aes.aesDecode(props.getProperty("password"));	//암호화된 코드 디코드
-			
+	       		       	
+			if(aes != null)	{
+				dbPassword = aes.aesDecode(props.getProperty("password"));	//복호화
+			}
 			if(dbPassword != null) {
 				Class.forName("org.mariadb.jdbc.Driver");
 				conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
@@ -78,6 +77,13 @@ public class DBConnector {
 			System.err.println("CommDAO IllegalBlockSizeException error");
 		} catch (BadPaddingException e) {
 			System.err.println("CommDAO BadPaddingException error");
+		}	
+		*/
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+			conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
+		} catch(Exception e) {
+			System.err.println(e);
 		}
 	}
 

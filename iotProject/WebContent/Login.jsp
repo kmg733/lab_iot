@@ -30,13 +30,13 @@
 			out.flush();
 		}
 		else if(type.equals("find")) {
-			String returns = lin.findPW(id, name, phoneNum);
+			String returns = lin.findPW(name, id, phoneNum);
 			out.clear();
 			out.print(returns);
 			out.flush();
 		}
-		else if(type.equals("modify")) {
-			String returns = lin.modifyPW(id, pwd);
+		else if(type.equals("change")) {
+			String returns = lin.changePW(id, pwd);
 			out.clear();
 			out.print(returns);
 			out.flush();
