@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
-public class MemberState {
+public class MemberState {	//	인원 현황 관리
 	private static MemberState instance = new MemberState();
 	
 	public static MemberState getInstance() {
@@ -15,15 +15,15 @@ public class MemberState {
 	}
 	
 	private DBConnector dbc = new DBConnector();	//	DBConnector 객체생성
-	private Connection conn;	//	db에 접근하게 해주는 객체
-	private String sql = ""; 	//	쿼리1(MariaDB에 들어갈 명령어지문)
+	private Connection conn;	
+	private String sql = ""; 	
 	private String sql2 = "";
-	private PreparedStatement pstmt;		//	db에 sql문을 전달해주는 객체
+	private PreparedStatement pstmt;	
 	private PreparedStatement pstmt2;
-	private ResultSet rs;	//	db에서 쿼리의 실행결과를 가져오는 객체
+	private ResultSet rs;	
 	private StringBuilder returnb;
-	private String returns; //메소드 성공 여부 반환	
-	private Random rn;	//	비밀번호를 재발급 받을때 랜덤값을 만들 랜덤함수;
+	private String returns; 	
+	private Random rn;	
 	private int tempPW;
 	
 	public String memShow() {	//	회원 정보 리스트
@@ -35,7 +35,7 @@ public class MemberState {
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
 			returnb = new StringBuilder("");
 			while(rs.next()) {
-				returnb.append("{name:" +rs.getString("save_title") +",phone:" + rs.getString("phone")
+				returnb.append("{name:" +rs.getString("name") +",phone:" + rs.getString("phone")
 			+ ",dept:"+ rs.getString("dept") +",team:"+ rs.getString("team") +"}");	//	returns문에 json데이터 형태로 보내주기 위해 returnb에 appned함
 				//https://freegae.tistory.com/5  (참고하기 - json데이터)
 			}
@@ -57,29 +57,27 @@ public class MemberState {
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			sql = "select * from member where name=? and phone=? and dept=? and team=?"; // 
+			sql = "select * from member where name=? and phone=?"; // 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, name);
 			pstmt.setString(2, phone);
-			pstmt.setString(3, dept);
-			pstmt.setString(4, team);
 			rs = pstmt.executeQuery(); // db에 쿼리문 입력
 			if(rs.next()) {	//	이미 해당 내용이 존재할 때
 				returns = "memAleadyExist";
 			}
 			else {	//	존재하지 않을 때
 				sql2 = "insert into member (name, phone, dept, team) values (?, ?, ?, ?)"; // 
-				pstmt2 = conn.prepareStatement(sql);
+				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, name);
 				pstmt2.setString(2, phone);
 				pstmt2.setString(3, dept);
 				pstmt2.setString(4, team);
-				pstmt2.executeQuery();
+				pstmt2.executeUpdate();
 				returns = "memAddSuccess";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			returns = "error";
+			returns = "error " + e;
 		}
 		finally {
 			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
@@ -101,14 +99,14 @@ public class MemberState {
 			rs = pstmt.executeQuery(); // db에 쿼리문 입력
 			if(rs.next()) {	//	해당 name과 phone 데이터가 존재할 때
 				sql2 = "update member set name=?, phone=?, dept=?, team=? where name=? and phone=?"; // 
-				pstmt2 = conn.prepareStatement(sql);
+				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, afterName);
 				pstmt2.setString(2, afterPhone);
 				pstmt2.setString(3, afterDept);
 				pstmt2.setString(4, afterTeam);
 				pstmt2.setString(5, beforeName);
 				pstmt2.setString(6, beforePhone);
-				pstmt2.executeQuery();
+				pstmt2.executeUpdate();
 				returns = "memModifySuccess";
 			}
 			else {	//	존재하지 않을 때
@@ -130,14 +128,26 @@ public class MemberState {
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			sql = "delete from member where name=? and phone=? and dept=? and team=?"; // user 테이블에 id와 name에 해당되는 레코드 삭제
+			sql = "select * from member where name=? and phone=? and dept=? and team=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, name);
 			pstmt.setString(2, phone);
 			pstmt.setString(3, dept);
 			pstmt.setString(4, team);
-			pstmt.executeQuery(); // db에 쿼리문 입력
-			returns = "memDeleted";
+			rs = pstmt.executeQuery();
+			if(rs.next()) {	//	해당 내용의 멤버가 존재할 때
+				sql2 = "delete from member where name=? and phone=? and dept=? and team=?"; // user 테이블에 id와 name에 해당되는 레코드 삭제
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setString(1, name);
+				pstmt2.setString(2, phone);
+				pstmt2.setString(3, dept);
+				pstmt2.setString(4, team);
+				pstmt2.executeUpdate(); // db에 쿼리문 입력
+				returns = "memDeleted";				
+			}
+			else {	//	해당 내용의 멤버가 존재하지 않을 때
+				returns = "memNotExist";
+			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 			returns = "error";

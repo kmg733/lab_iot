@@ -9,18 +9,12 @@
 		
 		Conference conf = Conference.getInstance();
 		
-		if(type.equals("cfAdd")) {
+		if(type.equals("cfAdd")) {	//	수정도 가능
 			String returns = conf.cfAdd(date, text);
 			out.clear();
 			out.print(returns);
 			out.flush();
-		}
-		else if(type.equals("cfModify")) {
-			String returns = conf.cfModify(date, text);
-			out.clear();
-			out.print(returns);
-			out.flush();			
-		}
+		}		
 		else if(type.equals("cfShow")) {
 			String returns = conf.cfShow(date);
 			out.clear();

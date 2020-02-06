@@ -5,10 +5,10 @@
 		request.setCharacterEncoding("UTF-8");
 		String name = request.getParameter("name");
 		String phone = request.getParameter("phone");
-		String dept = request.getParameter("dept");		//과정
-		String team = request.getParameter("team");		//소속
-		String beforeName = request.getParameter("name");	//modify를 할 때 데이터 베이스에서 해당 회원 정보를 찾기위해 수정 전의 정보가 필요
-		String beforePhone = request.getParameter("phone");	//modify를 할 때 데이터 베이스에서 해당 회원 정보를 찾기위해 수정 전의 정보가 필요
+		String dept = request.getParameter("dept");		//	과정
+		String team = request.getParameter("team");		//	소속
+		String beforeName = request.getParameter("b_name");	
+		String beforePhone = request.getParameter("b_phone");	
 		String type = request.getParameter("type");	//	사용자구 무슨요청을 했는지 구분하는 변수
 		
 		MemberState memState = MemberState.getInstance();
