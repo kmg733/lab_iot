@@ -13,7 +13,8 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="E:/eclipse/jar files/commons-codec-1.14.jar"/>
-	<classpathentry kind="lib" path="E:/eclipse/jar files/mariadb-java-client-2.5.4.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/jar_files/commons-codec-1.14.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/jar_files/cos.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/jar_files/mariadb-java-client-2.5.4.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

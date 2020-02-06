@@ -12,24 +12,6 @@
 		
 		User user = User.getInstance();
 		
-	/* 
-	if (type.equals("user_List")) {
-		String returns = user.user_List();
-		out.clear();
-		out.print(returns);
-		out.flush();
-	} else if (type.equals("user_Add")) {
-		String returns = user.user_Add(name, id, pwd); //추가할 이름, 추가할 아이디
-		out.clear();
-		out.print(returns);
-		out.flush();	 
-	} else if (type.equals("user_Delete")) {
-		String returns = user.user_Delete(name, id); //삭제할 이름, 삭제할 아이디
-		out.clear();
-		out.print(returns);
-		out.flush();
-	} */
-	
 	if (type.equals("addUser_List")) {
 		String returns = user.addUser_List(); //add-user테이블에 추가된 정보 찾기
 		out.clear();

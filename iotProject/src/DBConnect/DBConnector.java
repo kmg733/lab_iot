@@ -17,7 +17,7 @@ import javax.crypto.NoSuchPaddingException;
 
 import util.AESDec;
 
-public class DBConnector {
+public class DBConnector {	//	DB접근제어
 	private Connection conn;
 	private AESDec aes;
 	

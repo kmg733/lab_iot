@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
-public class Login {
+public class Login {	//	로그인 회원가입 관리
 	private static Login instance = new Login();
 		
 	public static Login getInstance() {
