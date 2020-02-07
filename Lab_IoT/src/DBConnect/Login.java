@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class Login {	//	로그인 회원가입 관리
 	private static Login instance = new Login();
 		
@@ -76,11 +78,11 @@ public class Login {	//	로그인 회원가입 관리
 				returns = rs.getString("password") +" "+ "loginSuccess";
 			}
 			else {	//	로그인 실패
-				returns = "loginFailed"; // user 테이블에 정보가 비었을 때
+				returns = "0 loginFailed"; // user 테이블에 정보가 비었을 때
 			}
 		}
 		catch (Exception e) {
-			returns = "error";
+			returns = "0 error";
 		}
 		finally {
 			if (rs != null)try {rs.close();} catch (SQLException ex) {}
@@ -138,24 +140,29 @@ public class Login {	//	로그인 회원가입 관리
 		return returns;
 	}
 	
-	public String changePW(String id ,String pw) {	//	마이페이지에서 비밀번호 수정
+	public String changePwd(String id ,String pwd, String b_pwd) {	//	마이페이지에서 비밀번호 수정
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
-			sql = "select * from user where id=?";
+			/* 이부분에 복호화 코드 넣기  */			
+			sql = "select password from user where id=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
 			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	id가 user테이블에 존재할 때
-				sql2 = "update user set password=? where id=?";	//	쿼리구문
-				pstmt2 = conn.prepareStatement(sql2);	//	db에 접근하기 위한 쿼리(sql변수)를 저장
-				pstmt2.setString(1, pw);	
-				pstmt2.setString(2, id);	
-				pstmt2.executeUpdate();	//	db에 쿼리문 입력	
-				returns = "pwChangeSuccess";
+			if(rs.next()) {	//	id가 user테이블에 존재할 때				
+				if(BCrypt.checkpw(b_pwd, rs.getString("password"))) {	//	입력한 비밀번호가 현재 비밀번호와 일치 할 때
+					sql2 = "update user set password=?";	//	쿼리구문
+					pstmt2 = conn.prepareStatement(sql2);	//	db에 접근하기 위한 쿼리(sql변수)를 저장
+					pstmt2.setString(1, pwd);	
+					pstmt2.executeUpdate();	//	db에 쿼리문 입력	
+					returns = "pwdChangeSuccess";
+				}	
+				else {	//	현재 패스워드가 일치하지 않을 때
+					returns = "pwdChangeFailed";
+				}
 			}
 			else {	//	id가 user테이블에 존재하지 않을 때
-				returns = "pwChangeFailed";
+				returns = "idNotExist";
 			}
 		}
 		catch (Exception e) {
@@ -172,8 +179,8 @@ public class Login {	//	로그인 회원가입 관리
 		return returns;
 	}
 	
-	//주민번호를 저장하는 테이블이 없음 <- 전화번호로 대체함, 재발급이 아니라 pw를 보여주는 형식으로 구현함 << 확인못함 금욜날가서 확인하기
-	public String findPW(String name, String id, String phoneNum) {	//	비밀번호 재발급
+	//주민번호를 저장하는 테이블이 없음 <- 전화번호로 대체함, 재발급이 아니라 pw를 보여주는 형식으로 구현함 <<
+	public String findPwd(String name, String id, String phoneNum) {	//	비밀번호 재발급
 		try {
 			rn = new Random();
 			Class.forName("org.mariadb.jdbc.Driver");
