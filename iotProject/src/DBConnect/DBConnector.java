@@ -23,10 +23,10 @@ public class DBConnector {	//	DB접근제어
 	
 	private String dbURL = "jdbc:mariadb://localhost:3306/iot?serverTimezone=UTC";	//	db주소
 	private String dbID = "testid";	//	db아이디
-	private String dbPassword = "security915!";	//	db비밀번호
+	private String dbPassword = "";	//	db비밀번호
 	
 	public DBConnector() {
-		/*
+		
 		try {
 			//암호화된 DB password read
 				String propFile = "E:\\eclipse\\iotProject\\src\\util\\key.properties";		
@@ -35,7 +35,7 @@ public class DBConnector {	//	DB접근제어
 	       		props.load(new java.io.BufferedInputStream(fis));			
 	       		
 			//암호화에 사용할 키 read
-	       		String read_key = "E:\\eclipse\\jar files\\key_management\\keymanagement.properties";
+	       		String read_key = "E:\\eclipse\\jar_files\\key_management\\keymanagement.properties";
 	        	Properties key = new Properties();	        
 	       		FileInputStream key_fis = new FileInputStream(read_key);
 	       		key.load(new java.io.BufferedInputStream(key_fis));
@@ -78,13 +78,7 @@ public class DBConnector {	//	DB접근제어
 		} catch (BadPaddingException e) {
 			System.err.println("CommDAO BadPaddingException error");
 		}	
-		*/
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
-		} catch(Exception e) {
-			System.err.println(e);
-		}
+		
 	}
 
 

@@ -6,10 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Conference {	//	회의록
-private static Conference instance = new Conference();
+public class Rule {	//	회의록
+private static Rule instance = new Rule();
 	
-	public static Conference getInstance() {
+	public static Rule getInstance() {
 		return instance;
 	}
 	
@@ -22,19 +22,19 @@ private static Conference instance = new Conference();
 	private ResultSet rs;	
 	private String returns;
 	
-	public String cfShow(String date) {	//	회의록 내용 보기
+	public String ruleShow() {	//	규칙 내용 보기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-			sql = "select * from meetlog where save_date=?";
+			sql = "select * from rule";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, date);
-			rs = pstmt.executeQuery();			
-			if(rs.next()) {	//	date에 해당되는 날자의 회의록이 존재할 떄
-				returns = rs.getString("save_text");
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {	//	규칙이 존재할 때
+				returns = rs.getString("save_text") + " ruleExist";
 			}
-			else {	//	date에 해당되는 날자의 회의록이 존재하지 않을 때
-				returns = "cfNotExist";
+			else {	//	규칙이 존재하지 않을 때
+				returns = "0 ruleNotExist";
 			} 
 		}
 		catch(Exception e) {
@@ -49,30 +49,27 @@ private static Conference instance = new Conference();
 		return returns;
 	}
 	
-	public String cfAdd(String date, String text) {	//	회의 내용 등록 - 수정버튼 필요없이 저장시 새로 갱신
+	public String ruleAdd(String text) {	//	규칙 내용 등록 - 수정버튼 필요없이 저장시 새로 갱신
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
-			sql = "select * from meetlog where save_date=?";
+			sql = "select * from rule";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, date);
 			rs = pstmt.executeQuery();
 			
-			if(rs.next()) {	//	해당 날짜의 회의내용이 존재할 때 - 수정
-				sql2 = "update meetlog set save_text=? where save_date=?"; 	//	meetlog 데이터베이스에 새로운 정보 등록
+			if(rs.next()) {	//	규칙 내용이 존재할 때 - 수정
+				sql2 = "update meetlog set save_text=?"; 	//	meetlog 데이터베이스에 새로운 정보 등록
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, text);
-				pstmt2.setString(2, date);
-				pstmt2.executeUpdate();	//	db에 쿼리문 입력	
-			}
-			else {	//	해당 날짜의 회의내용이 존재하지 않을 때 - 새로생성
-				sql2 = "insert into meetlog (save_date, save_text) values (?, ?)"; 	//	meetlog 데이터베이스에 새로운 정보 등록
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setString(1, date);
-				pstmt2.setString(2, text);
 				pstmt2.executeUpdate();	//	db에 쿼리문 입력
 			}
-			returns = "cfAdded";
+			else {	//	해당 날짜의 회의내용이 존재하지 않을 때 - 새로생성
+				sql2 = "insert into meetlog (save_text) values (?)"; 	//	meetlog 데이터베이스에 새로운 정보 등록
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setString(1, text);
+				pstmt2.executeUpdate();	//	db에 쿼리문 입력
+			}
+			returns = "ruleAdded";
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -84,7 +81,6 @@ private static Conference instance = new Conference();
 			if (rs != null)try {rs.close();} catch (SQLException ex) {}
 		}
 		return returns;
-	}	
-	
+	}		
 	
 }

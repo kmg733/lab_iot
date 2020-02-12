@@ -7,15 +7,21 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Enumeration;
 
-public class ImageUpload {	//	이미지 관련 업로드
+import javax.servlet.http.HttpServletRequest;
+
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+
+public class ImageUpload { // 이미지 관련 업로드
 	private static ImageUpload instance = new ImageUpload();
 	
-	public static ImageUpload getInstance() {
+	public static ImageUpload getInstance( ) {
 		return instance;
 	}
-	
-	private DBConnector dbc = new DBConnector();	//	DBConnector 객체생성
+
+	private DBConnector dbc = new DBConnector(); // DBConnector 객체생성
 	private Connection conn;
 	private String sql = "";
 	private String sql2 = "";
@@ -24,583 +30,372 @@ public class ImageUpload {	//	이미지 관련 업로드
 	private ResultSet rs;
 	private String returns;
 	private int result;
-	
-	//이미지 파일 참고 - https://aristatait.tistory.com/16?category=672398, https://hks003.tistory.com/11
-package DBConnect;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+	private int max = 1024 * 1024 * 10; // 파일크기 제한 - 10MB
+	private String originFile = ""; // 업로드할 실제 파일명
+	private HttpServletRequest req;
+	 
+	// 이미지 파일 참고 - https://aristatait.tistory.com/16?category=672398,
+	// https://hks003.tistory.com/11
 
-public class ImageUpload {	//	이미지 관련 업로드
-	private static ImageUpload instance = new ImageUpload();
-	
-	public static ImageUpload getInstance() {
-		return instance;
+	public void setReq(HttpServletRequest req) {
+		this.req = req;
 	}
 	
-	private DBConnector dbc = new DBConnector();	//	DBConnector 객체생성
-	private Connection conn;
-	private String sql = "";
-	private String sql2 = "";
-	private PreparedStatement pstmt;
-	private PreparedStatement pstmt2;
-	private ResultSet rs;
-	private String returns;
-	private int result;
-	
-	//이미지 파일 참고 - https://aristatait.tistory.com/16?category=672398, https://hks003.tistory.com/11
-	public String orgUpload(int number, String fileName) {	//	연구실 조직도 이미지 업로드
+	public String orgShow(int number) {	//	연구실 조직도 이미지 불러오기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from organization where number=?"; // organization 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update organization set organization_image=? where number=?"; // organization 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력						
-				returns = "orgModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into organization (number, organizaion_image) values (?, ?)"; // organization 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력				
-				returns = "orgUploaded";
-			}			
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String orgDelete(int number) {	//	연구실 조직도 이미지 삭제
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 			sql = "select * from organization where number=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, number);
 			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from organization where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
+			if(rs.next()) {	//	업로드한 이미지 파일이 존재할 때
+				returns = rs.getString("organization_image");
+			} 
+			else {	//	업로드한 이미지 파일이 존재하지 않을 때
+				returns = "fileNotExist";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			returns = "error";
+		}
+
+		return returns;
+	}
+
+	public String orgUpload(int number, String savePath) { // 연구실 조직도 이미지 업로드
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+
+			MultipartRequest multi = new MultipartRequest(req, savePath, max, "utf-8"); // savePath 경로에 파일 저장
+																						//동일한 파일명이 있을 경우 덮어쓰기 한다
+			
+			Enumeration files = multi.getFileNames();
+			String str = (String) files.nextElement();
+			originFile = multi.getOriginalFileName(str); // 파일의 원래 이름
+			String filePath = savePath+originFile;
+			
+			sql = "select * from organization where number=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, number);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) { // 이미지(경로)가 있을 때
+				sql2 = "update organization set organization_image=? where number=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setString(1, filePath);
+				pstmt2.setInt(2, number);
+				pstmt2.executeUpdate();
+			} else { // 이미지(경로)가 없을 때
+				sql2 = "insert into organization (number, organizaion_image) values (?, ?)";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "orgDeleted";				
+				pstmt2.setString(2, filePath);
+				pstmt2.executeUpdate();
 			}
-			else {
+			returns = "orgUploaded";
+		} catch (Exception e) {
+			e.printStackTrace();
+			returns = "error";
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+				}
+		}
+		return returns;
+	}
+
+	public String orgDelete(int number) { // 연구실 조직도 이미지 삭제
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			sql = "select * from organization where number=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, number);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				sql2 = "delete from organization where number=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setInt(1, number);
+				pstmt2.executeQuery();
+				returns = "orgDeleted";
+			} else {
 				returns = "orgNotExist";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+				}
 		}
 		return returns;
-	}	
+	}
 	
-	public String strUpload(int number, String fileName) {	//	연구실 구성도 이미지 업로드
+	public String strShow(int number) {	//	연구실 구성도 이미지 불러오기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from structure where number=?"; // structure 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update structure set structure_image=? where number=?"; // structure 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력
-				returns = "strModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into structure (number, structure_image) values (?, ?)"; // structure 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력				
-				returns = "strUploaded";
-			}	
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String strDelete(int number) {	//	연구실 구성도 이미지 삭제
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 			sql = "select * from structure where number=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, number);
 			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from structure where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
+			if(rs.next()) {	//	업로드한 이미지 파일이 존재할 때
+				returns = rs.getString("structure_image");
+			} 
+			else {	//	업로드한 이미지 파일이 존재하지 않을 때
+				returns = "fileNotExist";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			returns = "error";
+		}
+
+		return returns;
+	}
+
+	
+	public String strUpload(int number, String savePath) { // 연구실 구성도 이미지 업로드
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+
+			MultipartRequest multi = new MultipartRequest(req, savePath, max, "utf-8"); // savePath 경로에 파일 저장
+																						//동일한 파일명이 있을 경우 덮어쓰기 한다
+			
+			Enumeration files = multi.getFileNames();
+			String str = (String) files.nextElement();
+			originFile = multi.getOriginalFileName(str); // 파일의 원래 이름
+			String filePath = savePath+originFile;
+			
+			sql = "select * from structure where number=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, number);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) { // 이미지(경로)가 있을 때
+				sql2 = "update structure set structure_image=? where number=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setString(1, filePath);
+				pstmt2.setInt(2, number);
+				pstmt2.executeUpdate();
+			} else { // 이미지(경로)가 없을 때
+				sql2 = "insert into structure (number, structure_image) values (?, ?)";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "strDeleted";				
+				pstmt2.setString(2, filePath);
+				pstmt2.executeUpdate();
 			}
-			else {
+			returns = "strUploaded";
+		} catch (Exception e) {
+			e.printStackTrace();
+			returns = "error";
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+				}
+		}
+		return returns;
+	}
+	
+	public String strDelete(int number) { // 연구실 구성도 이미지 삭제
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			sql = "select * from structure where number=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, number);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				sql2 = "delete from structure where number=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setInt(1, number);
+				pstmt2.executeQuery();
+				returns = "strDeleted";
+			} else {
 				returns = "strNotExist";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-	
-	public String ipUpload(int number, String fileName) {	//	연구실 ip 및 출입키 이미지 업로드
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from ip where number=?"; // ip 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update ip set ip_image=? where number=?"; // ip 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력		
-				returns = "ipModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into ip (number, ip_image) values (?, ?)"; // ip 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력	
-				returns = "ipUploaded";
-			}	
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+				}
 		}
 		return returns;
-	}	
+	}
 
-	public String ipDelete(int number) {	//	연구실 ip 및 출입키 이미지 삭제
+	public String ipShow(int number) {	//	연구실 ip 및 출입키 이미지 불러오기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 			sql = "select * from ip where number=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, number);
 			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from ip where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
+			if(rs.next()) {	//	업로드한 이미지 파일이 존재할 때
+				returns = rs.getString("ip_image");
+			} 
+			else {	//	업로드한 이미지 파일이 존재하지 않을 때
+				returns = "fileNotExist";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			returns = "error";
+		}
+
+		return returns;
+	}
+	
+	
+	public String ipUpload(int number, String savePath) { // 연구실 구성도 이미지 업로드
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+
+			MultipartRequest multi = new MultipartRequest(req, savePath, max, "utf-8"); // savePath 경로에 파일 저장
+																						//동일한 파일명이 있을 경우 덮어쓰기 한다
+			
+			Enumeration files = multi.getFileNames();
+			String str = (String) files.nextElement();
+			originFile = multi.getOriginalFileName(str); // 파일의 원래 이름
+			String filePath = savePath+originFile;
+			
+			sql = "select * from ip where number=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, number);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) { // 이미지(경로)가 있을 때
+				sql2 = "update ip set ip_image=? where number=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setString(1, filePath);
+				pstmt2.setInt(2, number);
+				pstmt2.executeUpdate();
+			} else { // 이미지(경로)가 없을 때
+				sql2 = "insert into ip (number, ip_image) values (?, ?)";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "ipDeleted";				
+				pstmt2.setString(2, filePath);
+				pstmt2.executeUpdate();
 			}
-			else {
+			returns = "ipUploaded";
+		} catch (Exception e) {
+			e.printStackTrace();
+			returns = "error";
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+				}
+		}
+		return returns;
+	}
+	
+	public String ipDelete(int number) { // 연구실 ip 및 출입키 이미지 삭제
+		try {
+			Class.forName("org.mariadb.jdbc.Driver");
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			sql = "select * from ip where number=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, number);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				sql2 = "delete from ip where number=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setInt(1, number);
+				pstmt2.executeQuery();
+				returns = "ipDeleted";
+			} else {
 				returns = "ipNotExist";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String ruleUpload(int number, String fileName) {	//	연구실 규칙 이미지 업로드
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from rule where number=?"; // rule 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update rule set role_image=? where number=?"; // rule 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력	
-				returns = "ruleModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into rule (number, role_image) values (?, ?)"; // rule 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력	
-				returns = "ruleUploaded";
-			}	
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String ruleDelete(int number) {	//	연구실 규칙 이미지 삭제
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			sql = "select * from rule where number=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from rule where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "ruleDeleted";				
-			}
-			else {
-				returns = "ruleNotExist";
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+				}
 		}
 		return returns;
 	}
-}
-	public String orgUpload(int number, String fileName) {	//	연구실 조직도 이미지 업로드
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from organization where number=?"; // organization 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update organization set organization_image=? where number=?"; // organization 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력						
-				returns = "orgModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into organization (number, organizaion_image) values (?, ?)"; // organization 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력				
-				returns = "orgUploaded";
-			}			
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
 
-	public String orgDelete(int number) {	//	연구실 조직도 이미지 삭제
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			sql = "select * from organization where number=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from organization where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "orgDeleted";				
-			}
-			else {
-				returns = "orgNotExist";
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-	
-	public String strUpload(int number, String fileName) {	//	연구실 구성도 이미지 업로드
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from structure where number=?"; // structure 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update structure set structure_image=? where number=?"; // structure 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력
-				returns = "strModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into structure (number, structure_image) values (?, ?)"; // structure 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력				
-				returns = "strUploaded";
-			}	
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String strDelete(int number) {	//	연구실 구성도 이미지 삭제
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			sql = "select * from structure where number=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from structure where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "strDeleted";				
-			}
-			else {
-				returns = "strNotExist";
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-	
-	public String ipUpload(int number, String fileName) {	//	연구실 ip 및 출입키 이미지 업로드
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from ip where number=?"; // ip 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update ip set ip_image=? where number=?"; // ip 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력		
-				returns = "ipModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into ip (number, ip_image) values (?, ?)"; // ip 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력	
-				returns = "ipUploaded";
-			}	
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String ipDelete(int number) {	//	연구실 ip 및 출입키 이미지 삭제
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			sql = "select * from ip where number=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from ip where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "ipDeleted";				
-			}
-			else {
-				returns = "ipNotExist";
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String ruleUpload(int number, String fileName) {	//	연구실 규칙 이미지 업로드
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			File imgFile = new File(fileName);
-			FileInputStream fin = new FileInputStream(imgFile);
-			sql = "select * from rule where number=?"; // rule 테이블의 이미지 숫자와 이지미에 접근
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	이미지가 있을 때
-				sql2 = "update rule set role_image=? where number=?"; // rule 테이블의 이미지 업데이트
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setBinaryStream(1, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.setInt(2, number);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력	
-				returns = "ruleModified";
-			}
-			else {	//	이미지가 없을 때
-				sql2 = "insert into rule (number, role_image) values (?, ?)"; // rule 테이블의 이미지 넣기
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.setBinaryStream(2, fin, (int)imgFile.length());	//	데이터 베이스에 이미지 파일 업로드
-				pstmt2.executeUpdate(); // db에 쿼리문 입력	
-				returns = "ruleUploaded";
-			}	
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}	
-
-	public String ruleDelete(int number) {	//	연구실 규칙 이미지 삭제
-		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
-			sql = "select * from rule where number=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, number);
-			rs = pstmt.executeQuery();
-			if(rs.next()) {
-				sql2 = "delete from rule where number=?"; // organization테이블의 number에 해당되는 레코드 삭제
-				pstmt2 = conn.prepareStatement(sql2);
-				pstmt2.setInt(1, number);
-				pstmt2.executeQuery(); // db에 쿼리문 입력
-				returns = "ruleDeleted";				
-			}
-			else {
-				returns = "ruleNotExist";
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			returns = "error";
-		}
-		finally {
-			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
-			if (conn != null)try {conn.close();} catch (SQLException ex) {}
-			if (rs != null)try {rs.close();} catch (SQLException ex) {}
-		}
-		return returns;
-	}
 }

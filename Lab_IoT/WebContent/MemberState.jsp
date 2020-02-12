@@ -9,7 +9,7 @@
 		String team = request.getParameter("team");		//	소속
 		String beforeName = request.getParameter("b_name");	
 		String beforePhone = request.getParameter("b_phone");	
-		String type = request.getParameter("type");	//	사용자구 무슨요청을 했는지 구분하는 변수
+		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수
 		
 		MemberState memState = MemberState.getInstance();
 		

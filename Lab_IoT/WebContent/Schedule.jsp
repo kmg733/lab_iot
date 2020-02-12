@@ -7,7 +7,7 @@
 		String b_title = request.getParameter("b_title");		
 		String text = request.getParameter("text");
 		String date = request.getParameter("date");		
-		String type = request.getParameter("type");	//	사용자구 무슨요청을 했는지 구분하는 변수
+		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수
 		
 		Schedule sche = Schedule.getInstance();
 		
