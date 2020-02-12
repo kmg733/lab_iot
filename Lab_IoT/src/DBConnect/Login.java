@@ -5,7 +5,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.Random;
+
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -28,7 +35,8 @@ public class Login {	//	로그인 회원가입 관리
 	private ResultSet rs2;
 	private String returns;
 	private Random rn;	//	비밀번호를 재발급 받을때 랜덤값을 만들 랜덤함수;
-	private int tempPW;	
+	private String rePwd =  "";
+	private String securedPwd = ""; 
 		
 	public String adminLogin(String name, String id, String pwd) { //	관리자 로그인
 		try {
@@ -82,7 +90,7 @@ public class Login {	//	로그인 회원가입 관리
 			}
 		}
 		catch (Exception e) {
-			returns = "0 error";
+			returns = "error";
 		}
 		finally {
 			if (rs != null)try {rs.close();} catch (SQLException ex) {}
@@ -92,7 +100,7 @@ public class Login {	//	로그인 회원가입 관리
 		return returns;
 	}
 	
-	public String createAccount(String name, String id, String pwd) {	//	회원가입
+	public String createAccount(String name, String id, String pwd, String mail) {	//	회원가입
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
@@ -112,11 +120,12 @@ public class Login {	//	로그인 회원가입 관리
 					returns = "acountAleadyExist";										
 				}
 				else {	//	회원정보가 없을 때
-					sql3 = "insert into user (id, password, name) values (?, ?, ?)";
+					sql3 = "insert into user (id, password, name, mail) values (?, ?, ?, ?)";
 					pstmt3 = conn.prepareStatement(sql3);
 					pstmt3.setString(1, id);
 					pstmt3.setString(2, pwd);
 					pstmt3.setString(3, name);
+					pstmt3.setString(4, mail);
 					pstmt3.executeUpdate();	
 					returns = "accountCreated";
 				}
@@ -140,29 +149,24 @@ public class Login {	//	로그인 회원가입 관리
 		return returns;
 	}
 	
-	public String changePwd(String id ,String pwd, String b_pwd) {	//	마이페이지에서 비밀번호 수정
+	public String changePW(String id ,String pw) {	//	마이페이지에서 비밀번호 수정
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
-			/* 이부분에 복호화 코드 넣기  */			
-			sql = "select password from user where id=?";
+			sql = "select * from user where id=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
 			rs = pstmt.executeQuery();
-			if(rs.next()) {	//	id가 user테이블에 존재할 때				
-				if(BCrypt.checkpw(b_pwd, rs.getString("password"))) {	//	입력한 비밀번호가 현재 비밀번호와 일치 할 때
-					sql2 = "update user set password=?";	//	쿼리구문
-					pstmt2 = conn.prepareStatement(sql2);	//	db에 접근하기 위한 쿼리(sql변수)를 저장
-					pstmt2.setString(1, pwd);	
-					pstmt2.executeUpdate();	//	db에 쿼리문 입력	
-					returns = "pwdChangeSuccess";
-				}	
-				else {	//	현재 패스워드가 일치하지 않을 때
-					returns = "pwdChangeFailed";
-				}
+			if(rs.next()) {	//	id가 user테이블에 존재할 때
+				sql2 = "update user set password=? where id=?";	//	쿼리구문
+				pstmt2 = conn.prepareStatement(sql2);	//	db에 접근하기 위한 쿼리(sql변수)를 저장
+				pstmt2.setString(1, pw);	
+				pstmt2.setString(2, id);	
+				pstmt2.executeUpdate();	//	db에 쿼리문 입력	
+				returns = "pwChangeSuccess";
 			}
 			else {	//	id가 user테이블에 존재하지 않을 때
-				returns = "idNotExist";
+				returns = "pwChangeFailed";
 			}
 		}
 		catch (Exception e) {
@@ -179,29 +183,78 @@ public class Login {	//	로그인 회원가입 관리
 		return returns;
 	}
 	
-	//주민번호를 저장하는 테이블이 없음 <- 전화번호로 대체함, 재발급이 아니라 pw를 보여주는 형식으로 구현함 <<
-	public String findPwd(String name, String id, String phoneNum) {	//	비밀번호 재발급
+	//주민번호를 저장하는 테이블이 없음 <- 전화번호로 대체함, 재발급이 아니라 pw를 보여주는 형식으로 구현함 << 확인못함 금욜날가서 확인하기
+	public String findPW(String name, String id, String mail) {	//	비밀번호 재발급
 		try {
 			rn = new Random();
+			rn.setSeed(System.currentTimeMillis());	//	같은 난수 발생 방지를 위한 시드설정	
+			
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
-			sql = "select * from member where id=? and name=? and phone=?";	//	쿼리구문
+			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인			
+			sql = "select * from user where id=? and name=?";	//	쿼리구문
 			pstmt = conn.prepareStatement(sql);	//	db에 접근하기 위한 쿼리(sql변수)를 저장
 			pstmt.setString(1, id);		
 			pstmt.setString(2, name);		
-			pstmt.setString(3, phoneNum);		
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력	
-			if(rs.next()) {	//	member 데이터베이스에 해당 id, name, phoneNum을 가진 데이터가 있을 때
-				tempPW = rn.nextInt(100);
-				sql2 = "update user set password=? where id=?";	//	쿼리구문
-				pstmt2 = conn.prepareStatement(sql2);	//	db에 접그하기 위한 쿼리(sql2변수)를 저장
-				pstmt2.setString(1, "security" + tempPW);	//	임시비밀번호를 securityXX로 설정
-				pstmt2.setString(2, id);
-				pstmt2.executeUpdate();		//	쿼리문을 업데이트함
-				returns = rs.getString("password");
+			if(rs.next()) {	//	user 데이터베이스에 해당 id, name을 가진 데이터가 있을 때
+				rePwd = "security"+rn.nextInt(100);
+				securedPwd = BCrypt.hashpw(rePwd, BCrypt.gensalt());	//	새로 생성한 비밀번호 암호화
+				
+				//	새로 초기화한 비밀번호를 암호화해서 데이터베이스에 저장
+				sql2 = "update user set password=? where id=?";
+				pstmt = conn.prepareStatement(sql2);
+				pstmt.setString(1, securedPwd);
+				pstmt.setString(2, id);
+				pstmt.executeUpdate();
+				
+				//	이메일로 보내는 코드
+				EmailInfo em = new EmailInfo();
+				
+				String host = "smtp.naver.com";
+				final String username = em.getEmailId();	//보낼 id
+				final String password = em.getEmailPwd();	//보낼 pwd
+				int port = 465; //네이버전용
+//				int port = 587; //구글전용
+				// 메일 내용
+				String recipient = "mink906@gmail.com"; // 받는 사람의 메일주소를 입력해주세요.
+				String subject = "메일테스트"; // 메일 제목 입력해주세요.
+				String body = "비밀번호는 rlaalsrb733"+ "입니다."; // 메일 내용 입력해주세요.
+				
+				Properties props = System.getProperties(); // 정보를 담기 위한 객체 생성
+				// SMTP 서버 정보 설정
+				props.put("mail.smtp.host", host);
+				props.put("mail.smtp.port", port);
+				props.put("mail.smtp.auth", "true");
+				props.put("mail.smtp.ssl.enable", "true");
+				props.put("mail.smtp.ssl.trust", host);
+				
+				// Session 생성
+				Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+					String un = username;
+					String pw = password;
+
+					protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+						return new javax.mail.PasswordAuthentication(un, pw);
+					}
+				});
+				session.setDebug(true); // for debug
+				Message mimeMessage = new MimeMessage(session);
+				// MimeMessage 생성
+				try {
+					mimeMessage.setFrom(new InternetAddress(em.getEmailId()+"@naver.com"));
+					// 발신자 셋팅 , 보내는 사람의 이메일주소를 한번 더 입력합니다. 이때는 이메일 풀 주소를 다 작성해주세요.
+					mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+					// 수신자셋팅 //.TO 외에 .CC(참조) .BCC(숨은참조) 도 있음
+					mimeMessage.setSubject(subject); // 제목셋팅
+					mimeMessage.setText(body); // 내용셋팅
+					Transport.send(mimeMessage); // javax.mail.Transport.send() 이용
+				}	catch(Exception e) {
+					e.printStackTrace();
+				}
+				
 			}
-			else {	//	member 데이터베이스에 해당 데이터가 없을 때
-				returns = "memberNotExist";
+			else {	//	user 데이터베이스에 해당 데이터가 없을 때
+				returns = "userNotExist";
 			}
 		}
 		catch (Exception e) {

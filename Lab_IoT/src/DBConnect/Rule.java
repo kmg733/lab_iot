@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Rule {	//	회의록
+public class Rule {	//	규칙
 private static Rule instance = new Rule();
 	
 	public static Rule getInstance() {
@@ -55,16 +55,15 @@ private static Rule instance = new Rule();
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
 			sql = "select * from rule";
 			pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			
+			rs = pstmt.executeQuery();			
 			if(rs.next()) {	//	규칙 내용이 존재할 때 - 수정
-				sql2 = "update meetlog set save_text=?"; 	//	meetlog 데이터베이스에 새로운 정보 등록
+				sql2 = "update rule set save_text=?"; 	//	meetlog 데이터베이스에 새로운 정보 등록
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, text);
 				pstmt2.executeUpdate();	//	db에 쿼리문 입력
 			}
 			else {	//	해당 날짜의 회의내용이 존재하지 않을 때 - 새로생성
-				sql2 = "insert into meetlog (save_text) values (?)"; 	//	meetlog 데이터베이스에 새로운 정보 등록
+				sql2 = "insert into rule (save_text) values (?)"; 	//	meetlog 데이터베이스에 새로운 정보 등록
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, text);
 				pstmt2.executeUpdate();	//	db에 쿼리문 입력
@@ -81,7 +80,6 @@ private static Rule instance = new Rule();
 			if (rs != null)try {rs.close();} catch (SQLException ex) {}
 		}
 		return returns;
-	}	
-	
+	}		
 	
 }

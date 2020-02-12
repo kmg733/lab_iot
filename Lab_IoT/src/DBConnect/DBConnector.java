@@ -20,9 +20,9 @@ import util.AESDec;
 public class DBConnector {	//	DB접근제어
 	private Connection conn;
 	private AESDec aes;
-	
+	//서버 ip : 210.125.212.191:8888
 	private String dbURL = "jdbc:mariadb://localhost:3306/iot?serverTimezone=UTC";	//	db주소
-	private String dbID = "testid";	//	db아이디
+	private String dbID = "root";	//	db아이디
 	private String dbPassword = "";	//	db비밀번호
 	
 	public DBConnector() {
@@ -79,7 +79,6 @@ public class DBConnector {	//	DB접근제어
 			System.err.println("CommDAO BadPaddingException error");
 		}	
 		
-	
 	}
 
 

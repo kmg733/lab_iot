@@ -90,7 +90,7 @@ public class Login {	//	로그인 회원가입 관리
 		return returns;
 	}
 	
-	public String createAccount(String name, String id, String pwd) {	//	회원가입
+	public String createAccount(String name, String id, String pwd, String mail) {	//	회원가입
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
@@ -110,11 +110,12 @@ public class Login {	//	로그인 회원가입 관리
 					returns = "acountAleadyExist";										
 				}
 				else {	//	회원정보가 없을 때
-					sql3 = "insert into user (id, password, name) values (?, ?, ?)";
+					sql3 = "insert into user (id, password, name, mail) values (?, ?, ?, ?)";
 					pstmt3 = conn.prepareStatement(sql3);
 					pstmt3.setString(1, id);
 					pstmt3.setString(2, pwd);
 					pstmt3.setString(3, name);
+					pstmt3.setString(4, mail);
 					pstmt3.executeUpdate();	
 					returns = "accountCreated";
 				}

@@ -1,3 +1,4 @@
+
 package DBConnect;
 
 import java.sql.Connection;
@@ -197,7 +198,7 @@ public class User {	//	회원 정보 관리
 	}
 	
 	/* 공통(수정) */
-	public String user_Modify(String before_name, String before_id ,String after_name, String after_id, String after_password) {	//	add_user테이블과 user테이블 모두 수정 가능
+	public String user_Modify(String before_name, String before_id ,String after_name, String after_id, String after_password, String after_mail) {	//	add_user테이블과 user테이블 모두 수정 가능
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
@@ -217,11 +218,12 @@ public class User {	//	회원 정보 관리
 					pstmt2.setString(4, before_name);
 					pstmt2.executeUpdate();	
 					
-					sql3 = "insert into user (id, password, name) values (?, ?, ?)";
+					sql3 = "insert into user (id, password, name, mail) values (?, ?, ?, ?)";
 					pstmt3 = conn.prepareStatement(sql3);
 					pstmt3.setString(1, after_id);					
 					pstmt3.setString(2, after_password);
 					pstmt3.setString(3, after_name);
+					pstmt3.setString(4, after_mail);
 					pstmt3.executeUpdate();
 					returns = "user_modified";
 				}
