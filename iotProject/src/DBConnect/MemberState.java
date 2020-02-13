@@ -27,7 +27,7 @@ public class MemberState {	//	인원 현황 관리
 	private int tempPW;
 	
 	public String memShow() {	//	회원 정보 리스트
-		try {			
+		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
 			sql = "select * from member"; 	//	member 테이블로부터 모든 정보를 가져옴
@@ -77,7 +77,7 @@ public class MemberState {	//	인원 현황 관리
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			returns = "error " + e;
+			returns = "error";
 		}
 		finally {
 			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}

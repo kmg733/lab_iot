@@ -32,11 +32,11 @@ public class User {	//	회원 정보 관리
 	
 	/* 관리자 - 회원 정보 관리 */	
 	
-	public String user_List() {	//	회원 정보 리스트 - user 테이블 리스트
+	public String addUser_List() {	//	회원 정보 리스트 - add_user 테이블 리스트
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
-			sql = "select * from user"; 	//	user테이블로부터 모든 정보를 불러오기
+			sql = "select * from add_user"; 	//	user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
 			returnb = new StringBuilder("");
@@ -58,23 +58,23 @@ public class User {	//	회원 정보 관리
 		return returns;
 	}
 	
-	public String addUser_List() {	//	회원 정보 리스트 - add_user 테이블 리스트
+	public String user_List() {	//	회원 정보 리스트 - user 테이블 리스트
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
-			sql = "select * from add_user"; 	//	user테이블로부터 모든 정보를 불러오기
+			sql = "select * from user"; 	//	user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
 			returnb = new StringBuilder("");
 			while(rs.next()) {
-				returnb.append("{name:"+rs.getString("name")+",id:" +rs.getString("id")+"}");	//	회원 리스트에 표시할 이름과 id를 가져옴, json데이터 형태로 보낸다
+				returnb.append("{name:"+rs.getString("name")+",id:" +rs.getString("id")+",mail:"+rs.getString("mail")+"}");	//	회원 리스트에 표시할 이름과 id, mail을 가져옴, json데이터 형태로 보낸다
 				//https://freegae.tistory.com/5  (참고하기 - json데이터)
 			}
 			returns = returnb.toString();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-			returns = "error " + e;
+			returns = "error";
 		}
 		finally {
 			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
@@ -92,10 +92,10 @@ public class User {	//	회원 정보 관리
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
 			rs = pstmt.executeQuery();
-			if(rs.next()) {
+			if(rs.next()) {	//	id가 이미 존재할 때
 				returns = "IDAleadyExist";
 			}
-			else {
+			else {	//	id가 존재하지 않아서 추가 할 때
 				sql2 = "insert into add_user (id, name) values (?, ?)";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, id);
@@ -105,7 +105,7 @@ public class User {	//	회원 정보 관리
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
-			returns = ""+e;
+			returns = "error";
 		}		
 		return returns;
 		
@@ -128,7 +128,7 @@ public class User {	//	회원 정보 관리
 				pstmt2.executeUpdate(); // db에 쿼리문 입력
 				returns = "user_deleted";				
 			}
-			else {
+			else {	//	user테이블에 id가 존재 하지 않을때
 				returns = "user_valueNotExistToDelete";
 			}
 			
@@ -179,7 +179,7 @@ public class User {	//	회원 정보 관리
 					pstmt3.setString(1, id);
 					pstmt3.setString(2, name);
 					pstmt3.executeUpdate(); // db에 쿼리문 입력
-					returns ="deleteAllSuccess2";
+					returns ="deleteAllSuccess";
 				}
 				else {	//	add_user테이블에 정보가 존재하지 않을 때
 					returns = "addUserDataNotExist";

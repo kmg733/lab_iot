@@ -191,34 +191,40 @@ public class Login {	//	로그인 회원가입 관리
 			
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인			
-			sql = "select * from user where id=? and name=?";	//	쿼리구문
+			sql = "select * from user where id=? and name=? and mail=?";	//	쿼리구문
 			pstmt = conn.prepareStatement(sql);	//	db에 접근하기 위한 쿼리(sql변수)를 저장
 			pstmt.setString(1, id);		
-			pstmt.setString(2, name);		
+			pstmt.setString(2, name);
+			pstmt.setString(3, mail);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력	
-			if(rs.next()) {	//	user 데이터베이스에 해당 id, name을 가진 데이터가 있을 때
-				rePwd = "security"+rn.nextInt(100);
+			if(rs.next()) {	//	user 데이터베이스에 해당 id, namem, mail을 가진 데이터가 있을 때
+				rePwd = "security"+rn.nextInt(1000);
+				System.out.println("rePwd = " + rePwd);
 				securedPwd = BCrypt.hashpw(rePwd, BCrypt.gensalt());	//	새로 생성한 비밀번호 암호화
 				
 				//	새로 초기화한 비밀번호를 암호화해서 데이터베이스에 저장
-				sql2 = "update user set password=? where id=?";
-				pstmt = conn.prepareStatement(sql2);
-				pstmt.setString(1, securedPwd);
-				pstmt.setString(2, id);
-				pstmt.executeUpdate();
+				sql2 = "update user set password=? where id=? and name=?";
+				pstmt2 = conn.prepareStatement(sql2);
+				pstmt2.setString(1, securedPwd);
+				pstmt2.setString(2, id);
+				pstmt2.setString(3, name);
+				pstmt2.executeUpdate();
 				
 				//	이메일로 보내는 코드
 				EmailInfo em = new EmailInfo();
 				
 				String host = "smtp.naver.com";
 				final String username = em.getEmailId();	//보낼 id
-				final String password = em.getEmailPwd();	//보낼 pwd
+				final String password = em.getEmailPwd();	//보낼 id의 pwd
 				int port = 465; //네이버전용
 //				int port = 587; //구글전용
 				// 메일 내용
-				String recipient = "mink906@gmail.com"; // 받는 사람의 메일주소를 입력해주세요.
-				String subject = "메일테스트"; // 메일 제목 입력해주세요.
-				String body = "비밀번호는 rlaalsrb733"+ "입니다."; // 메일 내용 입력해주세요.
+				
+				String recipient = ""; // 받는 사람의 메일주소를 입력해주세요.
+				recipient = rs.getString("mail");
+				System.out.println("mail = " + recipient);
+				String subject = "변경된 비밀번호 입니다."; // 메일 제목 입력해주세요.
+				String body = "비밀번호는 "+ rePwd + "입니다."; // 메일 내용 입력해주세요.
 				
 				Properties props = System.getProperties(); // 정보를 담기 위한 객체 생성
 				// SMTP 서버 정보 설정
@@ -250,8 +256,9 @@ public class Login {	//	로그인 회원가입 관리
 					Transport.send(mimeMessage); // javax.mail.Transport.send() 이용
 				}	catch(Exception e) {
 					e.printStackTrace();
+					returns = "emailSendFailed";
 				}
-				
+				returns = "emailSendSuccess";
 			}
 			else {	//	user 데이터베이스에 해당 데이터가 없을 때
 				returns = "userNotExist";
