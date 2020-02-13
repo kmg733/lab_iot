@@ -7,7 +7,6 @@
 		String id = request.getParameter("id");
 		String pwd = request.getParameter("pwd");
 		String mail = request.getParameter("mail");
-		String phoneNum = request.getParameter("phone");
 		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수
 		
 		Login lin = Login.getInstance();
@@ -31,7 +30,7 @@
 			out.flush();
 		}
 		else if(type.equals("find")) {
-			String returns = lin.findPW(name, id, phoneNum);
+			String returns = lin.findPW(name, id, mail);
 			out.clear();
 			out.print(returns);
 			out.flush();

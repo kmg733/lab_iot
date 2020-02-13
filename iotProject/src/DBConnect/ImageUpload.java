@@ -1,7 +1,5 @@
 package DBConnect;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,7 +10,6 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 
 import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
 public class ImageUpload { // 이미지 관련 업로드
 	private static ImageUpload instance = new ImageUpload();
