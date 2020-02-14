@@ -8,6 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class User {	//	회원 정보 관리
 	private static User instance = new User();
 	
@@ -25,7 +28,6 @@ public class User {	//	회원 정보 관리
 	private PreparedStatement pstmt3;
 	private ResultSet rs;
 	private ResultSet rs2;
-	private StringBuilder returnb;
 	private String returns;
 	private Random rn;	//	비밀번호를 재발급 받을때 랜덤값을 만들 랜덤함수;
 	private int tempPW;
@@ -39,12 +41,30 @@ public class User {	//	회원 정보 관리
 			sql = "select * from add_user"; 	//	user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
-			returnb = new StringBuilder("");
+			
+			
+			JSONArray jary = new JSONArray();
+			
+			boolean flag = true;
+			
 			while(rs.next()) {
-				returnb.append("{name:"+rs.getString("name")+",id:" +rs.getString("id")+"}");	//	회원 리스트에 표시할 이름과 id를 가져옴, json데이터 형태로 보낸다
-				//https://freegae.tistory.com/5  (참고하기 - json데이터)
+				JSONObject jobj = new JSONObject();
+				jobj.put("name", rs.getString("name"));
+				jobj.put("id", rs.getString("id"));
+				jary.add(jobj);
+				
+				System.out.println(jary);
+				flag = false;
+				
+				//https://offbyone.tistory.com/373 (참고하기 - json데이터)
+				//https://dololak.tistory.com/625
 			}
-			returns = returnb.toString();
+			returns = jary.toJSONString();
+			if(flag) {
+				returns = "addUser_NotExist";
+			}
+			
+
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -65,12 +85,31 @@ public class User {	//	회원 정보 관리
 			sql = "select * from user"; 	//	user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
-			returnb = new StringBuilder("");
+			
+
+			JSONArray jary = new JSONArray();
+			
+			boolean flag = true;
+			
 			while(rs.next()) {
-				returnb.append("{name:"+rs.getString("name")+",id:" +rs.getString("id")+",mail:"+rs.getString("mail")+"}");	//	회원 리스트에 표시할 이름과 id, mail을 가져옴, json데이터 형태로 보낸다
-				//https://freegae.tistory.com/5  (참고하기 - json데이터)
+				JSONObject jobj = new JSONObject();
+				jobj.put("name", rs.getString("name"));
+				jobj.put("id", rs.getString("id"));
+				jobj.put("mail", rs.getString("mail"));
+				jary.add(jobj);
+				
+				flag = false;
+				//https://offbyone.tistory.com/373 (참고하기 - json데이터)
+				//https://dololak.tistory.com/625
+
 			}
-			returns = returnb.toString();
+			returns = jary.toJSONString();	//	json형태로 리스트 보내기
+			if(flag) {
+				returns = "user_NotEixst";
+			}		
+			
+			
+
 		}
 		catch(Exception e) {
 			e.printStackTrace();

@@ -34,7 +34,7 @@ private static Rule instance = new Rule();
 				returns = rs.getString("save_text") + " ruleExist";
 			}
 			else {	//	규칙이 존재하지 않을 때
-				returns = "0 ruleNotExist";
+				returns = "ruleNotExist";
 			} 
 		}
 		catch(Exception e) {

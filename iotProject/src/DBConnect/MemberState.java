@@ -7,6 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class MemberState {	//	인원 현황 관리
 	private static MemberState instance = new MemberState();
 	
@@ -21,7 +24,6 @@ public class MemberState {	//	인원 현황 관리
 	private PreparedStatement pstmt;	
 	private PreparedStatement pstmt2;
 	private ResultSet rs;	
-	private StringBuilder returnb;
 	private String returns; 	
 	private Random rn;	
 	private int tempPW;
@@ -33,13 +35,28 @@ public class MemberState {	//	인원 현황 관리
 			sql = "select * from member"; 	//	member 테이블로부터 모든 정보를 가져옴
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
-			returnb = new StringBuilder("");
+			
+			JSONArray jary = new JSONArray();
+			boolean flag = true;
+			
 			while(rs.next()) {
-				returnb.append("{name:" +rs.getString("name") +",phone:" + rs.getString("phone")
-			+ ",dept:"+ rs.getString("dept") +",team:"+ rs.getString("team") +"}");	//	returns문에 json데이터 형태로 보내주기 위해 returnb에 appned함
-				//https://freegae.tistory.com/5  (참고하기 - json데이터)
+				JSONObject jobj = new JSONObject();
+				jobj.put("name", rs.getString("name"));
+				jobj.put("phone", rs.getString("phone"));
+				jobj.put("dept", rs.getString("dept"));
+				jobj.put("team", rs.getString("team"));
+				jary.add(jobj);
+				
+				flag = false;
+				//https://offbyone.tistory.com/373 (참고하기 - json데이터)
+				//https://dololak.tistory.com/625
 			}
-			returns = returnb.toString();
+			returns = jary.toJSONString();//	json형태로 리스트 보내기
+			
+			if(flag) {
+				returns = "memNotExist";
+			}			
+
 		}
  		catch(Exception e) {
 			e.printStackTrace();
