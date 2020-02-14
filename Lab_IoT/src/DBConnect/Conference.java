@@ -31,7 +31,7 @@ private static Conference instance = new Conference();
 			pstmt.setString(1, date);
 			rs = pstmt.executeQuery();			
 			if(rs.next()) {	//	date에 해당되는 날자의 회의록이 존재할 떄
-				returns = rs.getString("save_text");
+				returns = rs.getString("save_text") + " cfExsit";
 			}
 			else {	//	date에 해당되는 날자의 회의록이 존재하지 않을 때
 				returns = "cfNotExist";

@@ -32,7 +32,7 @@ public class ImageUpload { // 이미지 관련 업로드
 	private String originFile = ""; // 업로드할 실제 파일명
 	private HttpServletRequest req;
 	 
-	// 이미지 파일 참고 - https://aristatait.tistory.com/16?category=672398,
+	// 이미지 파일 참고 - https://aristatait.tistory.com/16?category=672398
 	// https://hks003.tistory.com/11
 
 	public void setReq(HttpServletRequest req) {

@@ -12,7 +12,7 @@
 		Login lin = Login.getInstance();
 		
 		if(type.equals("adminLogin")) {
-			String returns = lin.adminLogin(name, id, pwd);
+			String returns = lin.adminLogin(id);
 			out.clear();
 			out.print(returns);
 			out.flush();

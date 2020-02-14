@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class Schedule {	//	일정 등록
 	private static Schedule instance = new Schedule();
 	
@@ -20,22 +23,33 @@ public class Schedule {	//	일정 등록
 	private PreparedStatement pstmt;
 	private PreparedStatement pstmt2;
 	private ResultSet rs;
-	private StringBuilder returnb; 
 	private String returns;
 	
-	public String scheduleList() {	//	일정 제목 목록 가져오기
+	public String scheduleList(String date) {	//	일정 제목 목록 가져오기
 		try {			
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-			sql = "select save_title from calander";
+			sql = "select * from calander where save_date=?";
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, date);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
-			returnb = new StringBuilder("");
+			
+			JSONArray jary = new JSONArray();
+			boolean flag = true;
+			
 			while(rs.next()) {
-				returnb.append("{save_title:" +rs.getString("save_title") + "}");	//	returns문에 json데이터 형태로 보내줌
-				//https://freegae.tistory.com/5  (참고하기 - json데이터)
+				JSONObject jobj = new JSONObject();
+				jobj.put("save_title", rs.getString("save_title"));
+				jary.add(jobj);
+				
+				flag = false;
 			}
-			returns = returnb.toString();
+			returns = jary.toJSONString();			
+					
+			if(flag) {	//	스케쥴이 존재하지 않을 때
+				returns = "scheduleNotExist";
+			}
+			
 		}
  		catch(Exception e) {
 			e.printStackTrace();
@@ -59,7 +73,7 @@ public class Schedule {	//	일정 등록
 			pstmt.setString(2, date);
 			rs = pstmt.executeQuery();			
 
-			if(rs.next()) {	//	해당 날짜에 해당 제목의 일정이 이미 존재 할 때
+			if(rs.next()) {	//	해당 날짜에 같은 제목이 존재할 때
 				returns = "scheduleAlreadyExist";
 			}
 			else {	//	해당 날짜에 해당 제목의 일정이 존재하지 않을 때
@@ -75,7 +89,7 @@ public class Schedule {	//	일정 등록
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-			returns = "error " + e;
+			returns = "error";
 		}
 		finally {
 			if (pstmt != null)try {pstmt.close();} catch (SQLException ex) {}
@@ -85,27 +99,35 @@ public class Schedule {	//	일정 등록
 		return returns;
 	}
 	
-	public String scheduleShow(String date) {	//	날자별 일정 보기
+	public String scheduleShow( String title, String date) {	//	제목에 해당하는 일정 상세히 보기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-			sql = "select * from calander where save_date=?"; 
+			sql = "select * from calander where save_date=? and save_title=?"; 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, date);
+			pstmt.setString(2, title);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
-			returnb = new StringBuilder("");
-			if(rs.next()) {	//	해당 날짜의 일정이 존재할 때
-				returnb.append("{save_title:"+ rs.getString("save_title") +",save_text:"
-			+ rs.getString("save_text")+",save_date:"+rs.getString("save_date") +"}"); //	returns문에 json데이터 형태로 보내줌				
-				while(rs.next()) {
-					returnb.append("{save_title:"+ rs.getString("save_title") +",save_text:"
-				+ rs.getString("save_text")+",save_date:"+rs.getString("save_date") +"}");
-				}				
-				returns = returnb.toString();
+			
+			JSONArray jary = new JSONArray();
+			boolean flag = true;
+			
+			while(rs.next()) {
+				JSONObject jobj = new JSONObject();
+				jobj.put("save_title", rs.getString("saveP_title"));
+				jobj.put("save_text", rs.getString("save_text"));
+				jobj.put("save_date", rs.getString("save_date"));
+				jary.add(jobj);
+				
+				flag = false;
 			}
-			else {	//	해당 날짜의 일정이 존재하지 않을 때
-				returns = "scheduleNotExist";
+			returns = jary.toJSONString();
+		
+			if(flag) {
+				returns = "scheduleNotEixst";
 			}
+			
+			
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -135,9 +157,6 @@ public class Schedule {	//	일정 등록
 				pstmt2.setString(2, date);
 				pstmt2.executeUpdate();	//	db에 쿼리문 입력
 				returns = "scheduleDelete";				
-			}
-			else {	//	일정이 존재하지 않을 때
-				returns = "scheduleNotExist";
 			}
 		}
 		catch(Exception e) {
@@ -169,10 +188,7 @@ public class Schedule {	//	일정 등록
 				pstmt2.setString(3, beforeTitle);
 				pstmt2.setString(4, date);
 				pstmt2.executeUpdate();	//	db에 쿼리문 입력
-				returns = "scheduleModified";				
-			}
-			else {	//	일정이 존재하지 않을 때
-				returns = "scheduleNotExist";
+				returns = "scheduleModify";				
 			}
 		}
 		catch(Exception e) {
