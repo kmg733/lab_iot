@@ -38,7 +38,7 @@ public class User {	//	회원 정보 관리
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
-			sql = "select * from add_user"; 	//	user테이블로부터 모든 정보를 불러오기
+			sql = "select * from add_user order by id desc"; 	//	user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
 			
@@ -82,7 +82,7 @@ public class User {	//	회원 정보 관리
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
-			sql = "select * from user"; 	//	user테이블로부터 모든 정보를 불러오기
+			sql = "select * from user order by id desc"; 	//	user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
 			
