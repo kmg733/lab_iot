@@ -32,7 +32,7 @@ public class MemberState {	//	인원 현황 관리
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
-			sql = "select * from member"; 	//	member 테이블로부터 모든 정보를 가져옴
+			sql = "select * from member order by name asc"; 	//	member 테이블로부터 모든 정보를 가져옴
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
 			

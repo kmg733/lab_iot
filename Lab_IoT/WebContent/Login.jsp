@@ -6,6 +6,7 @@
 		String name = request.getParameter("name");
 		String id = request.getParameter("id");
 		String pwd = request.getParameter("pwd");
+		String b_pwd = request.getParameter("b_pwd");
 		String mail = request.getParameter("mail");
 		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수
 		
@@ -36,7 +37,7 @@
 			out.flush();
 		}
 		else if(type.equals("change")) {
-			String returns = lin.changePW(id, pwd);
+			String returns = lin.changePW(id, pwd, b_pwd);
 			out.clear();
 			out.print(returns);
 			out.flush();

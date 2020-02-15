@@ -170,7 +170,7 @@ public class Login { // 로그인 회원가입 관리
 		return returns;
 	}
 
-	public String changePW(String id, String pw) { // 마이페이지에서 비밀번호 수정
+	public String changePW(String id, String pw, String b_pw) { // 마이페이지에서 비밀번호 수정
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
@@ -179,14 +179,20 @@ public class Login { // 로그인 회원가입 관리
 			pstmt.setString(1, id);
 			rs = pstmt.executeQuery();
 			if (rs.next()) { // id가 user테이블에 존재할 때
-				sql2 = "update user set password=? where id=?"; // 쿼리구문
-				pstmt2 = conn.prepareStatement(sql2); // db에 접근하기 위한 쿼리(sql변수)를 저장
-				pstmt2.setString(1, pw);
-				pstmt2.setString(2, id);
-				pstmt2.executeUpdate(); // db에 쿼리문 입력
-				returns = "pwChangeSuccess";
+				if(BCrypt.checkpw(b_pw, rs.getString("password"))) {
+					// 현재 비밀번호가 일치할 시
+					sql2 = "update user set password=? where id=?"; // 쿼리구문
+					pstmt2 = conn.prepareStatement(sql2); // db에 접근하기 위한 쿼리(sql변수)를 저장
+					pstmt2.setString(1, pw);
+					pstmt2.setString(2, id);
+					pstmt2.executeUpdate(); // db에 쿼리문 입력
+					returns = "pwdChangeSuccess";
+				}
+				else {
+					returns = "pwdChangeFailed";
+				}
 			} else { // id가 user테이블에 존재하지 않을 때
-				returns = "pwChangeFailed";
+				returns = "idNotExist";
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -232,7 +238,6 @@ public class Login { // 로그인 회원가입 관리
 			rs = pstmt.executeQuery(); // db에 쿼리문 입력
 			if (rs.next()) { // user 데이터베이스에 해당 id, name, mail을 가진 데이터가 있을 때
 				rePwd = "security" + rn.nextInt(1000) + "!!";
-				System.out.println("rePwd = " + rePwd);
 				securedPwd = BCrypt.hashpw(rePwd, BCrypt.gensalt()); // 새로 생성한 비밀번호 암호화
 
 				// 새로 초기화한 비밀번호를 암호화해서 데이터베이스에 저장
@@ -257,8 +262,7 @@ public class Login { // 로그인 회원가입 관리
 				recipient = rs.getString("mail");
 				System.out.println("mail = " + recipient);
 				String subject = "변경된 비밀번호 입니다."; // 메일 제목 입력해주세요.
-				String body = "비밀번호는 " + rePwd + "입니다."; // 메일 내용 입력해주세요.
-
+				String body = "비밀번호는 " + rePwd + " 입니다."; // 메일 내용 입력해주세요.
 				Properties props = System.getProperties(); // 정보를 담기 위한 객체 생성
 				// SMTP 서버 정보 설정
 				props.put("mail.smtp.host", host);
