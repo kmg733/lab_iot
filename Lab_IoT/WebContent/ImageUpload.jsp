@@ -4,8 +4,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="DBConnect.*"%>
 <%@ page import="java.util.Enumeration"%>
-
-출처: https://imdsoho.tistory.com/entry/ServletContext-이용하기 [삶은 예배다.] %>
+<%@ page import="java.io.FileInputStream" %>
 <%
 	request.setCharacterEncoding("UTF-8");
 	String imgName = request.getParameter(request.getParameter("imgName"));
@@ -13,8 +12,26 @@
 	String type = request.getParameter("type"); //	사용자가 무슨요청을 했는지 구분하는 변수
 	
 	ImageUpload imgup = new ImageUpload();
-	//https://riucc.tistory.com/403	파일 업로드 참고하기
-	String savePath = "";
+
+	//참고 : https://m.blog.naver.com/PostView.nhn?blogId=haengro&logNo=220663411505&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F	
+	//실제경로 구하기  
+	String savePath = this.getServletContext().getRealPath("/")+ "WEB-INF\\upload\\";
+	
+	/*	테스트
+	String imgName = "cat.bmp";	//임시값
+	String imgFile = "";
+	
+	File fi = new File("E:\\imageToStringUTF8.txt");
+	FileInputStream fis = new FileInputStream(fi);
+	int ch;
+	String str = "";
+	while((ch = fis.read()) != -1){
+		str += (char)ch;	
+	}
+	imgFile = str;
+
+	fis.close();
+	*/
 	
 	if (type.equals("orgShow")) {
 		String returns = imgup.orgShow();
@@ -51,5 +68,6 @@
 		out.clear();
 		out.print(returns);
 		out.flush();
-	}
+	} 
+	
 %>

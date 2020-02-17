@@ -12,7 +12,7 @@
 		Schedule sche = Schedule.getInstance();
 		
 		if(type.equals("scheduleList")) {
-			String returns = sche.scheduleList();
+			String returns = sche.scheduleList(date);
 			out.clear();
 			out.print(returns);
 			out.flush();
@@ -24,11 +24,12 @@
 			out.flush();			
 		}
 		else if(type.equals("scheduleShow")) {
-			String returns = sche.scheduleShow(date);	
+			String returns = sche.scheduleShow(title, date);	
 			out.clear();
 			out.print(returns);
 			out.flush();
 		}
+		
 		else if(type.equals("scheduleDelete")) {
 			String returns = sche.scheduleDelete(title, date);	
 			out.clear();

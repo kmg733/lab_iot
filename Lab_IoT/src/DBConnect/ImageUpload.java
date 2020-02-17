@@ -3,15 +3,15 @@ package DBConnect;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.codec.binary.Base64;
-
-
+import org.apache.tomcat.util.codec.binary.Base64;
 
 public class ImageUpload { // 이미지 관련 업로드
 	private static ImageUpload instance = new ImageUpload();
@@ -35,7 +35,6 @@ public class ImageUpload { // 이미지 관련 업로드
 	// 이미지 파일 참고 - https://aristatait.tistory.com/16?category=672398
 	// https://hks003.tistory.com/11
 
-
 	public String orgShow() { // 연구실 조직도 이미지 불러오기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
@@ -43,16 +42,18 @@ public class ImageUpload { // 이미지 관련 업로드
 			sql = "select * from organization";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
-			if (rs.next()) { // 업로드한 이미지 파일이 존재할 때
+			if (rs.next()) { // 업로드한 이미지 파일의 경로가 존재할 때
 				String filePath = rs.getString("organization_image");
 				File imgFile = new File(filePath);
-				
 				FileInputStream fis = new FileInputStream(imgFile);
-				byte[] encoding = new byte[(int)imgFile.length()];
-				fis.read(encoding, 0, encoding.length -1);
+
+				byte[] encoding = new byte[(int) imgFile.length()];
+				fis.read(encoding);
+				String encoded = Base64.encodeBase64String(encoding);
 				fis.close();
-				returns = Base64.encodeBase64String(encoding);
-			} else { // 업로드한 이미지 파일이 존재하지 않을 때
+
+				returns = encoded;
+			} else { // 업로드한 이미지 파일의 경로가 존재하지 않을 때
 				returns = "fileNotExist";
 			}
 
@@ -69,15 +70,15 @@ public class ImageUpload { // 이미지 관련 업로드
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 
-			String filePath = savePath + name;			
-			byte decode[] = Base64.decodeBase64(imgFile);
-			FileOutputStream fos;
-			
-			File img = new File(filePath);
-			fos = new FileOutputStream(img);			
-			fos.write(decode);
+			String filePath = savePath + name;
+
+			File file = new File(filePath);
+			FileOutputStream fos = new FileOutputStream(file);
+
+			byte decoded[] = Base64.decodeBase64(imgFile);
+			fos.write(decoded);
 			fos.close();
-			
+
 			sql = "select * from organization where organization_image=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, filePath);
@@ -89,7 +90,7 @@ public class ImageUpload { // 이미지 관련 업로드
 				pstmt2.setString(1, filePath);
 				pstmt2.executeUpdate();
 			} else { // 경로에 이미지가 없을 때
-				sql2 = "insert into organization (organizaion_image) values (?)";
+				sql2 = "insert into organization (organization_image) values (?)";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, filePath);
 				pstmt2.executeUpdate();
@@ -125,8 +126,17 @@ public class ImageUpload { // 이미지 관련 업로드
 			sql = "select * from structure";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
-			if (rs.next()) { // 업로드한 이미지 파일이 존재할 때
-				returns = rs.getString("structure_image");
+			if (rs.next()) { // 업로드한 이미지 파일의 경로가 존재할 때
+				String filePath = rs.getString("structure_image");
+				File imgFile = new File(filePath);
+				FileInputStream fis = new FileInputStream(imgFile);
+
+				byte[] encoding = new byte[(int) imgFile.length()];
+				fis.read(encoding);
+				String encoded = Base64.encodeBase64String(encoding);
+				fis.close();
+
+				returns = encoded;
 			} else { // 업로드한 이미지 파일이 존재하지 않을 때
 				returns = "fileNotExist";
 			}
@@ -144,12 +154,13 @@ public class ImageUpload { // 이미지 관련 업로드
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 
-			String filePath = savePath + name;			
-			byte decode[] = Base64.decodeBase64(imgFile);
-			FileOutputStream fos;
-			
-			fos = new FileOutputStream(filePath);			
-			fos.write(decode);
+			String filePath = savePath + name;
+
+			File file = new File(filePath);
+			FileOutputStream fos = new FileOutputStream(file);
+
+			byte decoded[] = Base64.decodeBase64(imgFile);
+			fos.write(decoded);
 			fos.close();
 
 			sql = "select * from structure where structure_image=?";
@@ -157,12 +168,12 @@ public class ImageUpload { // 이미지 관련 업로드
 			pstmt.setString(1, filePath);
 			rs = pstmt.executeQuery();
 
-			if (rs.next()) { // 이미지(경로)가 있을 때
+			if (rs.next()) { // 경로에 이미지가 있을 때
 				sql2 = "update structure set structure_image=?";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, filePath);
 				pstmt2.executeUpdate();
-			} else { // 이미지(경로)가 없을 때
+			} else { // 경로에 이미지가 없을 때
 				sql2 = "insert into structure (structure_image) values (?)";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, filePath);
@@ -199,8 +210,17 @@ public class ImageUpload { // 이미지 관련 업로드
 			sql = "select * from ip";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
-			if (rs.next()) { // 업로드한 이미지 파일이 존재할 때
-				returns = rs.getString("ip_image");
+			if (rs.next()) { // 업로드한 이미지 파일의 경로가 존재할 때
+				String filePath = rs.getString("ip_image");
+				File imgFile = new File(filePath);
+				FileInputStream fis = new FileInputStream(imgFile);
+
+				byte[] encoding = new byte[(int) imgFile.length()];
+				fis.read(encoding);
+				String encoded = Base64.encodeBase64String(encoding);
+				fis.close();
+
+				returns = encoded;
 			} else { // 업로드한 이미지 파일이 존재하지 않을 때
 				returns = "fileNotExist";
 			}
@@ -218,31 +238,32 @@ public class ImageUpload { // 이미지 관련 업로드
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 
-			String filePath = savePath + name;			
-			byte decode[] = Base64.decodeBase64(imgFile);
-			FileOutputStream fos;
-			
-			fos = new FileOutputStream(filePath);			
-			fos.write(decode);
+			String filePath = savePath + name;
+
+			File file = new File(filePath);
+			FileOutputStream fos = new FileOutputStream(file);
+
+			byte decoded[] = Base64.decodeBase64(imgFile);
+			fos.write(decoded);
 			fos.close();
-			
+
 			sql = "select * from ip where ip_image=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, filePath);
 			rs = pstmt.executeQuery();
 
-			if (rs.next()) { // 이미지(경로)가 있을 때
+			if (rs.next()) { // 경로에 이미지가 있을 때
 				sql2 = "update ip set ip_image=?";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, filePath);
 				pstmt2.executeUpdate();
-			} else { // 이미지(경로)가 없을 때
-				sql2 = "insert into ip (ip_image) values ( ?)";
+			} else { // 경로에 이미지가 없을 때
+				sql2 = "insert into ip (ip_image) values (?)";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, filePath);
 				pstmt2.executeUpdate();
 			}
-			returns = "ipUploaded";
+			returns = "ipUploaded";		
 		} catch (Exception e) {
 			e.printStackTrace();
 			returns = "error";

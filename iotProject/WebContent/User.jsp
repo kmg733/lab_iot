@@ -28,13 +28,7 @@
 		out.clear();
 		out.print(returns);
 		out.flush();
-	} else if (type.equals("user_List")) {
-		String returns = user.user_List(); //user테이블에 추가된 정보 찾기
-		out.clear();
-		out.print(returns);
-		out.flush();
-	}
-	else if (type.equals("user_Modify")) {	//add_user와 user 수정을 할 때 모두 이 메소드를 이용
+	} else if (type.equals("user_Modify")) {	//add_user와 user 수정을 할 때 모두 이 메소드를 이용
 		String returns = user.user_Modify(b_name, b_id, name, id, pwd, mail); //수정전 id,name - 수정후id,name,pwd
 		out.clear();
 		out.print(returns);
