@@ -31,7 +31,7 @@ private static Rule instance = new Rule();
 			rs = pstmt.executeQuery();
 			
 			if(rs.next()) {	//	규칙이 존재할 때
-				returns = rs.getString("save_text") + " ruleExist";
+				returns = rs.getString("save_text") + "-ruleExist";
 			}
 			else {	//	규칙이 존재하지 않을 때
 				returns = "ruleNotExist";
