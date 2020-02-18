@@ -110,21 +110,13 @@ public class Schedule {	//	일정 등록
 			pstmt.setString(2, title);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
 			
-			JSONArray jary = new JSONArray();
-			boolean flag = true;
-			
-			while(rs.next()) {
-				JSONObject jobj = new JSONObject();
-				jobj.put("save_title", rs.getString("saveP_title"));
-				jobj.put("save_text", rs.getString("save_text"));
-				jobj.put("save_date", rs.getString("save_date"));
-				jary.add(jobj);
-				
-				flag = false;
+			String get = "";
+			if(rs.next()) {
+				get = rs.getString("save_date") + "-" + rs.getString("save_title")
+				+ "-"+ rs.getString("save_text")+ "-scheduleExist";
+				returns = get;
 			}
-			returns = jary.toJSONString();
-		
-			if(flag) {
+			else {
 				returns = "scheduleNotEixst";
 			}
 			

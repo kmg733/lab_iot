@@ -262,7 +262,7 @@ public class User { // 회원 정보 관리
 		return returns;
 	}
 
-	/* 공통(수정) */
+	/* 공통(수정) 
 	public String user_Modify(String before_name, String before_id, String after_name, String after_id,
 			String after_password, String after_mail) { // add_user테이블과 user테이블 모두 수정 가능
 		try {
@@ -329,4 +329,6 @@ public class User { // 회원 정보 관리
 		}
 		return returns;
 	}
+	*/
+	
 }
