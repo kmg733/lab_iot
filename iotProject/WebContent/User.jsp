@@ -12,9 +12,13 @@
 		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수
 		
 		User user = User.getInstance();
-		
 	if (type.equals("addUser_List")) {
 		String returns = user.addUser_List(); //add-user테이블에 추가된 정보 찾기
+		out.clear();
+		out.print(returns);
+		out.flush();
+	} else if (type.equals("user_List")) {
+		String returns = user.user_List(name, id); //추가할 이름, 추가할 아이디
 		out.clear();
 		out.print(returns);
 		out.flush();

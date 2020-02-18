@@ -36,19 +36,20 @@ public class Schedule {	//	일정 등록
 			
 			JSONArray jary = new JSONArray();
 			boolean flag = true;
-			
+		
 			while(rs.next()) {
 				JSONObject jobj = new JSONObject();
-				jobj.put("save_title", rs.getString("save_title"));
+				jobj.put("save_text", rs.getString("save_text"));
 				jary.add(jobj);
 				
 				flag = false;
 			}
-			returns = jary.toJSONString();			
-					
 			if(flag) {	//	스케쥴이 존재하지 않을 때
 				returns = "scheduleNotExist";
 			}
+			
+			returns = jary.toJSONString();			
+					
 			
 		}
  		catch(Exception e) {

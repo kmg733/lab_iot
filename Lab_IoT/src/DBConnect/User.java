@@ -78,19 +78,18 @@ public class User {	//	회원 정보 관리
 		return returns;
 	}
 	
-	public String user_List() {	//	회원 정보 리스트 - user 테이블 리스트
+	public String user_List(String name, String id) {	//	회원 정보 리스트 - user 테이블 리스트
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
-			sql = "select * from user order by id desc"; 	//	user테이블로부터 모든 정보를 불러오기
+			sql = "select * from user where id=? and name=?"; 	//	user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, name);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
-			
 
 			JSONArray jary = new JSONArray();
-			
-			boolean flag = true;
-			
+			boolean flag = true;			
 			while(rs.next()) {
 				JSONObject jobj = new JSONObject();
 				jobj.put("name", rs.getString("name"));
@@ -101,15 +100,11 @@ public class User {	//	회원 정보 관리
 				flag = false;
 				//https://offbyone.tistory.com/373 (참고하기 - json데이터)
 				//https://dololak.tistory.com/625
-
 			}
 			returns = jary.toJSONString();	//	json형태로 리스트 보내기
 			if(flag) {
 				returns = "user_NotEixst";
 			}		
-			
-			
-
 		}
 		catch(Exception e) {
 			e.printStackTrace();

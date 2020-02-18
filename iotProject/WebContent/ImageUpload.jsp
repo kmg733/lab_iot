@@ -7,7 +7,6 @@
 <%@ page import="java.io.FileInputStream" %>
 <%
 	request.setCharacterEncoding("UTF-8");
-	String imgName = request.getParameter(request.getParameter("imgName"));
 	String imgFile = request.getParameter("imgFile");
 	String type = request.getParameter("type"); //	사용자가 무슨요청을 했는지 구분하는 변수
 	
@@ -17,29 +16,13 @@
 	//실제경로 구하기  
 	String savePath = this.getServletContext().getRealPath("/")+ "WEB-INF\\upload\\";
 	
-	/*	테스트
-	String imgName = "cat.bmp";	//임시값
-	String imgFile = "";
-	
-	File fi = new File("E:\\imageToStringUTF8.txt");
-	FileInputStream fis = new FileInputStream(fi);
-	int ch;
-	String str = "";
-	while((ch = fis.read()) != -1){
-		str += (char)ch;	
-	}
-	imgFile = str;
-
-	fis.close();
-	*/
-	
 	if (type.equals("orgShow")) {
 		String returns = imgup.orgShow();
 		out.clear();
 		out.print(returns);
 		out.flush();
 	} else if (type.equals("orgUpload")) {
-		String returns = imgup.orgUpload(imgName, savePath, imgFile);		
+		String returns = imgup.orgUpload(savePath, imgFile);		
 		out.clear();
 		out.print(returns);
 		out.flush();
@@ -49,7 +32,7 @@
 		out.print(returns);
 		out.flush();
 	} else if (type.equals("strUpload")) {
-		String returns = imgup.strUpload(imgName, savePath, imgFile);
+		String returns = imgup.strUpload(savePath, imgFile);
 		out.clear();
 		out.print(returns);
 		out.flush();
@@ -59,7 +42,7 @@
 		out.print(returns);
 		out.flush();
 	} else if (type.equals("ipUpload")) {
-		String returns = imgup.ipUpload(imgName, savePath, imgFile);
+		String returns = imgup.ipUpload(savePath, imgFile);
 		out.clear();
 		out.print(returns);
 		out.flush();

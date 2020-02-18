@@ -15,12 +15,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
-public class AESDec {
+public class DBAES {
 	
 	private String iv;
 	private Key keySpec;
 	 
-	public AESDec(String key) throws UnsupportedEncodingException {
+	public DBAES(String key) throws UnsupportedEncodingException {
         this.iv = key.substring(0, 16);
  
         byte[] keyBytes = new byte[16];
