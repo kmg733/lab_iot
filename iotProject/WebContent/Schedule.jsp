@@ -11,6 +11,7 @@
 		
 		Schedule sche = Schedule.getInstance();
 		
+		
 		if(type.equals("scheduleList")) {
 			String returns = sche.scheduleList(date);
 			out.clear();

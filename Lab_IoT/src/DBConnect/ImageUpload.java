@@ -65,11 +65,11 @@ public class ImageUpload { // 이미지 관련 업로드
 		return returns;
 	}
 
-	public String orgUpload(String name, String savePath, String imgFile) { // 연구실 조직도 이미지 업로드
+	public String orgUpload(String savePath, String imgFile) { // 연구실 조직도 이미지 업로드
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-
+			String name = "org.bmp";
 			String filePath = savePath + name;
 
 			File file = new File(filePath);
@@ -149,11 +149,11 @@ public class ImageUpload { // 이미지 관련 업로드
 		return returns;
 	}
 
-	public String strUpload(String name, String savePath, String imgFile) { // 연구실 구성도 이미지 업로드
+	public String strUpload(String savePath, String imgFile) { // 연구실 구성도 이미지 업로드
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-
+			String name = "str";
 			String filePath = savePath + name;
 
 			File file = new File(filePath);
@@ -233,11 +233,11 @@ public class ImageUpload { // 이미지 관련 업로드
 		return returns;
 	}
 
-	public String ipUpload(String name, String savePath, String imgFile) { // 연구실 구성도 이미지 업로드
+	public String ipUpload(String savePath, String imgFile) { // 연구실 구성도 이미지 업로드
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-
+			String name = "ip";
 			String filePath = savePath + name;
 
 			File file = new File(filePath);

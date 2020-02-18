@@ -15,11 +15,11 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import util.AESDec;
+import util.DBAES;
 
 public class DBConnector {	//	DB접근제어
 	private Connection conn;
-	private AESDec aes;
+	private DBAES aes;
 	//서버 ip : 210.125.212.191:8888
 	private String dbURL = "jdbc:mariadb://localhost:3306/iot?serverTimezone=UTC";	//	db주소
 	private String dbID = "root";	//	db아이디
@@ -42,7 +42,7 @@ public class DBConnector {	//	DB접근제어
 	       		
 	       		String aes_key = key.getProperty("key");
 	       		if(aes_key !=null) {
-	        		aes = new AESDec(aes_key);	//암호화에 사용할 키 전달 
+	        		aes = new DBAES(aes_key);	//암호화에 사용할 키 전달 
 	    		}	  
 	       		       	
 			if(aes != null)	{

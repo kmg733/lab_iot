@@ -7,7 +7,6 @@
 <%@ page import="java.io.FileInputStream" %>
 <%
 	request.setCharacterEncoding("UTF-8");
-	String imgName = request.getParameter(request.getParameter("imgName"));
 	String imgFile = request.getParameter("imgFile");
 	String type = request.getParameter("type"); //	사용자가 무슨요청을 했는지 구분하는 변수
 	
@@ -39,7 +38,7 @@
 		out.print(returns);
 		out.flush();
 	} else if (type.equals("orgUpload")) {
-		String returns = imgup.orgUpload(imgName, savePath, imgFile);		
+		String returns = imgup.orgUpload(savePath, imgFile);		
 		out.clear();
 		out.print(returns);
 		out.flush();
@@ -49,7 +48,7 @@
 		out.print(returns);
 		out.flush();
 	} else if (type.equals("strUpload")) {
-		String returns = imgup.strUpload(imgName, savePath, imgFile);
+		String returns = imgup.strUpload(savePath, imgFile);
 		out.clear();
 		out.print(returns);
 		out.flush();
@@ -59,7 +58,7 @@
 		out.print(returns);
 		out.flush();
 	} else if (type.equals("ipUpload")) {
-		String returns = imgup.ipUpload(imgName, savePath, imgFile);
+		String returns = imgup.ipUpload(savePath, imgFile);
 		out.clear();
 		out.print(returns);
 		out.flush();

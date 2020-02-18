@@ -57,7 +57,6 @@ private static Conference instance = new Conference();
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, date);
 			rs = pstmt.executeQuery();
-			
 			if(rs.next()) {	//	해당 날짜의 회의내용이 존재할 때 - 수정
 				sql2 = "update meetlog set save_text=? where save_date=?"; 	//	meetlog 데이터베이스에 새로운 정보 등록
 				pstmt2 = conn.prepareStatement(sql2);

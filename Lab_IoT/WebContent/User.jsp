@@ -18,6 +18,11 @@
 		out.clear();
 		out.print(returns);
 		out.flush();
+	} else if (type.equals("user_List")) {
+		String returns = user.user_List(name, id); //추가할 이름, 추가할 아이디
+		out.clear();
+		out.print(returns);
+		out.flush();
 	} else if (type.equals("addUser_Add")) {
 		String returns = user.addUser_Add(name, id); //추가할 이름, 추가할 아이디
 		out.clear();
