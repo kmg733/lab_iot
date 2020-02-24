@@ -6,15 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
 public class Conference {	//	회의록
 private static Conference instance = new Conference();
-	
+
 	public static Conference getInstance() {
 		return instance;
 	}
 	
 	private DBConnector dbc = new DBConnector();	//	DBConnector 객체생성
-	private Connection conn;
+	private Connection conn;    //  connecttion:db에 접근하게 해주는 객체
 	private String sql = "";
 	private String sql2 = "";
 	private PreparedStatement pstmt;
@@ -25,7 +26,7 @@ private static Conference instance = new Conference();
 	public String cfShow(String date) {	//	회의록 내용 보기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from meetlog where save_date=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, date);
@@ -52,7 +53,7 @@ private static Conference instance = new Conference();
 	public String cfAdd(String date, String text) {	//	회의 내용 등록 - 수정버튼 필요없이 저장시 새로 갱신
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인 
+			Connection conn = dbc.getConn();
 			sql = "select * from meetlog where save_date=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, date);

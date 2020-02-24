@@ -19,7 +19,7 @@ public class User { // 회원 정보 관리
 	}
 
 	private DBConnector dbc = new DBConnector(); // DBConnector 객체생성
-	private Connection conn;
+	private Connection conn;    //  connecttion:db에 접근하게 해주는 객체
 	private String sql = "";
 	private String sql2 = "";
 	private String sql3 = "";
@@ -37,7 +37,7 @@ public class User { // 회원 정보 관리
 	public String addUser_List() { // 회원 정보 리스트 - add_user 테이블 리스트
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from add_user order by id desc"; // user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery(); // db에 쿼리문 입력
@@ -80,7 +80,7 @@ public class User { // 회원 정보 관리
 	public String user_List(String name, String id) { // 회원 정보 리스트 - user 테이블 리스트
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from user where id=? and name=?"; // user테이블로부터 모든 정보를 불러오기
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
@@ -92,7 +92,7 @@ public class User { // 회원 정보 관리
 				+ "-" + rs.getString("mail") + "-userListExist";
 				returns = get;
 			} else {
-				returns = "user_NotEixst";
+				returns = "user_NotExist";
 			}
 			/*
 			JSONArray jary = new JSONArray();
@@ -134,7 +134,7 @@ public class User { // 회원 정보 관리
 	public String addUser_Add(String name, String id) { // 관리자가 add_user 테이블에 회원 정보를 추가할 때
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from add_user where id=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
@@ -160,7 +160,7 @@ public class User { // 회원 정보 관리
 	public String user_Delete(String name, String id) { // 회원 정보 삭제 - user테이블만
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from user where id=? and name=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
@@ -203,7 +203,7 @@ public class User { // 회원 정보 관리
 	public String addUser_Delete(String name, String id) { // 회원 정보 삭제 - user테이블과 add_user테이블 둘다
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from user where id=? and name=?"; // user 테이블에 id와 name에 해당되는 레코드 삭제
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
@@ -262,12 +262,12 @@ public class User { // 회원 정보 관리
 		return returns;
 	}
 
-	/* 공통(수정) 
+	/* 공통(수정) */
 	public String user_Modify(String before_name, String before_id, String after_name, String after_id,
 			String after_password, String after_mail) { // add_user테이블과 user테이블 모두 수정 가능
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from add_user where id=? and name=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, before_id);
@@ -275,7 +275,6 @@ public class User { // 회원 정보 관리
 			rs = pstmt.executeQuery();
 			if (rs.next()) { // add_user테이블에 수정할 id와 name이 존재할 때
 				if (user_Delete(before_id, before_name).equals("user_Deleted")) { // user테이블 에도 수정할 id와 name이 존재할 때
-					conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 					sql2 = "update add_user set id=?, name=? where id=? and name=?";
 					pstmt2 = conn.prepareStatement(sql2);
 					pstmt2.setString(1, after_id);
@@ -293,7 +292,6 @@ public class User { // 회원 정보 관리
 					pstmt3.executeUpdate();
 					returns = "user_modified";
 				} else { // add_user테이블에만 수정할 id와 name이 존재할 때
-					conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
 					sql2 = "update add_user set id=?, name=? where id=? and name=?";
 					pstmt2 = conn.prepareStatement(sql2);
 					pstmt2.setString(1, after_id);
@@ -329,6 +327,4 @@ public class User { // 회원 정보 관리
 		}
 		return returns;
 	}
-	*/
-	
 }

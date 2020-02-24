@@ -14,7 +14,7 @@
 
 	//참고 : https://m.blog.naver.com/PostView.nhn?blogId=haengro&logNo=220663411505&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F	
 	//실제경로 구하기  
-	String savePath = this.getServletContext().getRealPath("/")+ "WEB-INF\\upload\\";
+	String savePath = this.getServletContext().getRealPath("/")+ "WEB-INF/upload/";
 	
 	if (type.equals("orgShow")) {
 		String returns = imgup.orgShow();

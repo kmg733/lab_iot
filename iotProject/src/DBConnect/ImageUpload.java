@@ -21,7 +21,7 @@ public class ImageUpload { // 이미지 관련 업로드
 	}
 
 	private DBConnector dbc = new DBConnector(); // DBConnector 객체생성
-	private Connection conn;
+	private Connection conn;    //  connecttion:db에 접근하게 해주는 객체
 	private String sql = "";
 	private String sql2 = "";
 	private PreparedStatement pstmt;
@@ -29,7 +29,7 @@ public class ImageUpload { // 이미지 관련 업로드
 	private ResultSet rs;
 	private String returns;
 
-	private int max = 1024 * 1024 * 10; // 파일크기 제한 - 10MB
+	private long max = 1024 * 1024 * 10; // 파일크기 제한 - 10MB
 	private String originFile = ""; // 업로드할 실제 파일명
 
 	// 이미지 파일 참고 - https://aristatait.tistory.com/16?category=672398
@@ -38,7 +38,7 @@ public class ImageUpload { // 이미지 관련 업로드
 	public String orgShow() { // 연구실 조직도 이미지 불러오기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from organization";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -68,14 +68,15 @@ public class ImageUpload { // 이미지 관련 업로드
 	public String orgUpload(String savePath, String imgFile) { // 연구실 조직도 이미지 업로드
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-			String name = "org.bmp";
+			Connection conn = dbc.getConn();
+			
+			String name = "org.jpg";
 			String filePath = savePath + name;
 
 			File file = new File(filePath);
 			FileOutputStream fos = new FileOutputStream(file);
 
-			byte decoded[] = Base64.decodeBase64(imgFile);
+			byte decoded[] = Base64.decodeBase64(imgFile);	//	복호화된 이미지
 			fos.write(decoded);
 			fos.close();
 
@@ -122,7 +123,7 @@ public class ImageUpload { // 이미지 관련 업로드
 	public String strShow() { // 연구실 구성도 이미지 불러오기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from structure";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -152,8 +153,8 @@ public class ImageUpload { // 이미지 관련 업로드
 	public String strUpload(String savePath, String imgFile) { // 연구실 구성도 이미지 업로드
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-			String name = "str.bmp";
+			Connection conn = dbc.getConn();
+			String name = "str.jpg";
 			String filePath = savePath + name;
 
 			File file = new File(filePath);
@@ -206,7 +207,7 @@ public class ImageUpload { // 이미지 관련 업로드
 	public String ipShow() { // 연구실 ip 및 출입키 이미지 불러오기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from ip";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -236,8 +237,8 @@ public class ImageUpload { // 이미지 관련 업로드
 	public String ipUpload(String savePath, String imgFile) { // 연구실 구성도 이미지 업로드
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
-			String name = "ip.bmp";
+			Connection conn = dbc.getConn();
+			String name = "ip.jpg";
 			String filePath = savePath + name;
 
 			File file = new File(filePath);

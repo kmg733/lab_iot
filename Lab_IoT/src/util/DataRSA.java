@@ -1,7 +1,5 @@
 package util;
 
-
-
 import org.apache.commons.codec.binary.Base64;
 
 import java.security.InvalidKeyException;
@@ -23,26 +21,6 @@ import javax.crypto.NoSuchPaddingException;
 
 public class DataRSA {
 
-   public static void rsaKeyGen() throws NoSuchAlgorithmException { // RSA 비대칭키 생성
-
-        SecureRandom secureRandom = new SecureRandom(); // 안전한 난수 생성
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048, secureRandom); // 충분한 키길이 및 난수를 이용하여 키 초기화
-        KeyPair keyPair = keyPairGenerator.genKeyPair(); // 키 쌍 생성
-
-        PublicKey publicKey = keyPair.getPublic();
-        PrivateKey privateKey = keyPair.getPrivate();
-
-        // 누가버전까지는 Base64.encodeBase64String NotMethod 이슈발생
-        if((Build.VERSION.SDK_INT <= Build.VERSION_CODES.N)){
-            publicKEY = new String(Base64.encodeBase64(publicKey.getEncoded()));
-            privateKEY = new String(Base64.encodeBase64(privateKey.getEncoded()));
-        }else{
-            publicKEY = Base64.encodeBase64String(publicKey.getEncoded()); // 공개키 객체를 'String'으로 변환
-            privateKEY = Base64.encodeBase64String(privateKey.getEncoded()); // 개인키 객체를 'String'으로 변환
-        }
-    }
-
     /*암호화*/
     public static String rsaEncryption(String plainData, String stringPublicKey) throws BadPaddingException,
             IllegalBlockSizeException, InvalidKeySpecException,
@@ -62,10 +40,8 @@ public class DataRSA {
         byte[] byteEncryptedData = cipher.doFinal(plainData.getBytes());
 
         // 암호화 데이터, 인코딩 후 'String'으로 반환
-        if((Build.VERSION.SDK_INT <= Build.VERSION_CODES.N))
-            return new String(Base64.encodeBase64(byteEncryptedData));
-        else
-            return Base64.encodeBase64String(byteEncryptedData);
+        
+        return Base64.encodeBase64String(byteEncryptedData);
     }
 
     /*복호화*/

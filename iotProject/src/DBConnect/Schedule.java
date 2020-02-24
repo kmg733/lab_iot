@@ -17,7 +17,7 @@ public class Schedule {	//	일정 등록
 	}
 	
 	private DBConnector dbc = new DBConnector();	//	DBConnector 객체생성
-	private Connection conn;		
+	private Connection conn;    //  connecttion:db에 접근하게 해주는 객체
 	private String sql = ""; 		
 	private String sql2 = ""; 		
 	private PreparedStatement pstmt;
@@ -28,7 +28,7 @@ public class Schedule {	//	일정 등록
 	public String scheduleList(String date) {	//	일정 제목 목록 가져오기
 		try {			
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from calander where save_date=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, date);
@@ -39,7 +39,7 @@ public class Schedule {	//	일정 등록
 		
 			while(rs.next()) {
 				JSONObject jobj = new JSONObject();
-				jobj.put("save_text", rs.getString("save_text"));
+				jobj.put("save_title", rs.getString("save_title"));
 				jary.add(jobj);
 				
 				flag = false;
@@ -67,7 +67,7 @@ public class Schedule {	//	일정 등록
 	public String scheduleAdd(String title, String text, String date) {	//	일정 등록
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from calander where save_title=? and save_date=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, title);
@@ -103,7 +103,7 @@ public class Schedule {	//	일정 등록
 	public String scheduleShow( String title, String date) {	//	제목에 해당하는 일정 상세히 보기
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from calander where save_date=? and save_title=?"; 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, date);
@@ -137,7 +137,7 @@ public class Schedule {	//	일정 등록
 	public String scheduleDelete(String title, String date) {	//	일정 삭제
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); 
+			Connection conn = dbc.getConn();
 			sql = "select * from calander where save_title=? and save_date=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, title);
@@ -167,7 +167,7 @@ public class Schedule {	//	일정 등록
 	public String scheduleModify(String beforeTitle, String afterTitle, String afterText, String date) {	//	일정 수정
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	 
+			Connection conn = dbc.getConn();
 			sql = "select * from calander where save_title=? and save_date=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, beforeTitle);

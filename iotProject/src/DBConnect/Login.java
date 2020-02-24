@@ -24,7 +24,7 @@ public class Login { // 로그인 회원가입 관리
 	}
 
 	private DBConnector dbc = new DBConnector();
-	private Connection conn;
+	private Connection conn;    //  connecttion:db에 접근하게 해주는 객체
 	private String sql = "";
 	private String sql2 = "";
 	private String sql3 = "";
@@ -41,7 +41,7 @@ public class Login { // 로그인 회원가입 관리
 	public String adminLogin(String id) { // 관리자 로그인
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());
+			Connection conn = dbc.getConn();
 			sql = "select * from user where id=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id); // id에 admin id 넣기
@@ -76,7 +76,7 @@ public class Login { // 로그인 회원가입 관리
 	public String loginDB(String name, String id) { // 랩실부원 로그인
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from user where id=? and name=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
@@ -112,14 +112,14 @@ public class Login { // 로그인 회원가입 관리
 	public String createAccount(String name, String id, String pwd, String mail) { // 회원가입
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from add_user where id=? and name=?"; // 쿼리구문
 			pstmt = conn.prepareStatement(sql); // db에 접근하기 위한 쿼리(sql변수)를 저장
 			pstmt.setString(1, id);
 			pstmt.setString(2, name);
 			rs = pstmt.executeQuery();
 			if (rs.next()) { // 회원가입 대상자일 때
-				sql2 = "select * from user where id=? and password=? and name=?";
+				sql2 = "select * from user where id=? and name=?";
 				pstmt2 = conn.prepareStatement(sql2);
 				pstmt2.setString(1, id);
 				pstmt2.setString(2, pwd);
@@ -173,7 +173,7 @@ public class Login { // 로그인 회원가입 관리
 	public String changePW(String id, String pw, String b_pw) { // 마이페이지에서 비밀번호 수정
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from user where id=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
@@ -229,7 +229,7 @@ public class Login { // 로그인 회원가입 관리
 			rn.setSeed(System.currentTimeMillis()); // 같은 난수 발생 방지를 위한 시드설정
 
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from user where id=? and name=? and mail=?"; // 쿼리구문
 			pstmt = conn.prepareStatement(sql); // db에 접근하기 위한 쿼리(sql변수)를 저장
 			pstmt.setString(1, id);
