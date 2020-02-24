@@ -18,7 +18,7 @@ public class MemberState {	//	인원 현황 관리
 	}
 	
 	private DBConnector dbc = new DBConnector();	//	DBConnector 객체생성
-	private Connection conn;	
+	private Connection conn;    //  connecttion:db에 접근하게 해주는 객체
 	private String sql = ""; 	
 	private String sql2 = "";
 	private PreparedStatement pstmt;	
@@ -31,7 +31,7 @@ public class MemberState {	//	인원 현황 관리
 	public String memShow() {	//	회원 정보 리스트
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW());	//	데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from member order by name asc"; 	//	member 테이블로부터 모든 정보를 가져옴
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();	//	db에 쿼리문 입력
@@ -73,7 +73,7 @@ public class MemberState {	//	인원 현황 관리
 	public String memAdd(String name, String phone, String dept, String team) {	//	회원 등록
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from member where name=? and phone=?"; // 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, name);
@@ -108,7 +108,7 @@ public class MemberState {	//	인원 현황 관리
 	public String memModify(String beforeName, String beforePhone, String afterName, String afterPhone, String afterDept, String afterTeam) {	//	회원 정보 수정
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from member where name=? and phone=?"; // 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, beforeName);
@@ -144,7 +144,7 @@ public class MemberState {	//	인원 현황 관리
 	public String memDelete(String name, String phone, String dept, String team) {
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection(dbc.getURL(), dbc.getID(), dbc.getPW()); // 데이터베이스 접근을 위한 로그인
+			Connection conn = dbc.getConn();
 			sql = "select * from member where name=? and phone=? and dept=? and team=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, name);

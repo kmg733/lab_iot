@@ -21,21 +21,21 @@ public class DBConnector {	//	DB접근제어
 	private Connection conn;
 	private DBAES aes;
 	//서버 ip : 210.125.212.191:8888
-	private String dbURL = "jdbc:mariadb://localhost:3306/iot?serverTimezone=UTC";	//	db주소
-	private String dbID = "testid";	//	db아이디
+	private String dbURL = "jdbc:mariadb://localhost:3306/securitylab_andb?serverTimezone=UTC";	//	db주소
+	private String dbID = "root";	//	db아이디
 	private String dbPassword = "";	//	db비밀번호
 	
 	public DBConnector() {
 		
 		try {
 			//암호화된 DB password read
-				String propFile = "E:\\eclipse\\iotProject\\src\\util\\AESkey.properties";		
+				String propFile = "C:/Users/securityLab_5/eclipse-workspace/IoT/src/util/AESkey.properties";		
 	      		Properties props = new Properties();
 	      		FileInputStream fis = new FileInputStream(propFile);	         
 	       		props.load(new java.io.BufferedInputStream(fis));			
 	       		
 			//암호화에 사용할 키 read
-	       		String read_key = "E:\\eclipse\\jar_files\\key_management\\keymanagement.properties";
+	       		String read_key = "C:/Users/securityLab_5/Desktop/libraryFolder/key_management/keymanagement.properties";
 	        	Properties key = new Properties();	        
 	       		FileInputStream key_fis = new FileInputStream(read_key);
 	       		key.load(new java.io.BufferedInputStream(key_fis));
@@ -80,18 +80,13 @@ public class DBConnector {	//	DB접근제어
 		}	
 		
 	}
-
-
-	public String getURL() {
-		return dbURL;
+	public Connection getConn() {
+		try {
+			return DriverManager.getConnection(dbURL, dbID, dbPassword);
+		} catch(SQLException e) {
+			System.err.println("DBconnectorIoT Connection error");
+			return null;
+		}
 	}
-	
-	public String getID() {
-		return dbID;
-	}
-	
-	public String getPW() {
-		return dbPassword;
-	}		
 
 }
