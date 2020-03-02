@@ -1,0 +1,323 @@
+package jspConnect;
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import DBConnect.Schedule;
+import util.DataAES;
+
+public class ScheduleManager {
+	//	필요한 객체
+	private Schedule sche = Schedule.getInstance();;
+	private PropLoad pl;
+	
+	//	변수들
+	private String title;
+	private String b_title;		
+	private String text;
+	private String date;	
+	private String result;
+	
+	public ScheduleManager(PropLoad pl) {
+		this.pl = pl;
+	}
+	
+	public String scheduleListCheck(String date) {
+		try {
+			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
+			
+			//Cross-site Script Check
+			if(date != null) {
+				XSS xss = new XSS();
+				date = xss.prevention(date);			
+			} else {
+				date = "";
+			}	
+			
+			
+			result = sche.scheduleList(this.date);
+			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
+			
+			
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidKeyException error");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager UnsupportedEncodingException error");
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchPaddingException error");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchAlgorithmException error");
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidAlgorithmParameterException error");
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager BadPaddingException error");
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager IllegalBlockSizeException error");
+		}
+		
+		return result;
+	}
+	
+	public String scheduleAddCheck(String title, String text, String date) {
+		try {
+			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
+			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
+			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
+
+			//Cross-site Script Check
+			if(title != null) {
+				XSS xss = new XSS();
+				title = xss.prevention(title);			
+			} else {
+				title = "";
+			}	
+			if(text != null) {
+				XSS xss = new XSS();
+				text = xss.prevention(text);			
+			} else {
+				text = "";
+			}	
+			if(date != null) {
+				XSS xss = new XSS();
+				date = xss.prevention(date);			
+			} else {
+				date = "";
+			}	
+			
+			
+			result = sche.scheduleAdd(this.title, this.text, this.date);
+			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
+			
+			
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidKeyException error");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager UnsupportedEncodingException error");
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchPaddingException error");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchAlgorithmException error");
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidAlgorithmParameterException error");
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager BadPaddingException error");
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager IllegalBlockSizeException error");
+		}
+		
+		return result;
+	}
+	
+	public String scheduleShowCheck(String title, String date) {
+		try {
+			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
+			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
+
+			//Cross-site Script Check
+			if(title != null) {
+				XSS xss = new XSS();
+				title = xss.prevention(title);			
+			} else {
+				date = "";
+			}	
+			if(date != null) {
+				XSS xss = new XSS();
+				date = xss.prevention(date);			
+			} else {
+				date = "";
+			}	
+			
+			
+			result = sche.scheduleAdd(this.title, this.text, this.date);
+			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
+			
+			
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidKeyException error");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager UnsupportedEncodingException error");
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchPaddingException error");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchAlgorithmException error");
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidAlgorithmParameterException error");
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager BadPaddingException error");
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager IllegalBlockSizeException error");
+		}
+		
+		return result;
+	}
+	
+	public String scheduleDeleteCheck(String title, String date) {
+		try {
+			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
+			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
+
+			//Cross-site Script Check
+			if(title != null) {
+				XSS xss = new XSS();
+				title = xss.prevention(title);			
+			} else {
+				date = "";
+			}	
+			if(date != null) {
+				XSS xss = new XSS();
+				date = xss.prevention(date);			
+			} else {
+				date = "";
+			}	
+			
+			
+			result = sche.scheduleDelete(this.title, this.date);
+			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
+			
+			
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidKeyException error");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager UnsupportedEncodingException error");
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchPaddingException error");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchAlgorithmException error");
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidAlgorithmParameterException error");
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager BadPaddingException error");
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager IllegalBlockSizeException error");
+		}
+		
+		return result;
+	}
+	
+	public String scheduleModifyCheck(String b_title, String title, String text, String date) {
+		try {
+			this.b_title = DataAES.aesDecryption(b_title, pl.getSecurityKey());
+			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
+			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());			
+			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
+
+			//Cross-site Script Check
+			if(b_title != null) {
+				XSS xss = new XSS();
+				b_title = xss.prevention(b_title);			
+			} else {
+				b_title = "";
+			}	
+			if(text != null) {
+				XSS xss = new XSS();
+				text = xss.prevention(text);			
+			} else {
+				text = "";
+			}	
+			if(title != null) {
+				XSS xss = new XSS();
+				title = xss.prevention(title);			
+			} else {
+				date = "";
+			}	
+			if(date != null) {
+				XSS xss = new XSS();
+				date = xss.prevention(date);			
+			} else {
+				date = "";
+			}	
+			
+			
+			result = sche.scheduleModify(this.b_title, this.title, this.text, this.date);
+			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
+			
+			
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidKeyException error");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager UnsupportedEncodingException error");
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchPaddingException error");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchAlgorithmException error");
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidAlgorithmParameterException error");
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager BadPaddingException error");
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager IllegalBlockSizeException error");
+		}
+		
+		return result;
+	}
+	
+	public String scheduleError() {
+		try {
+			result = DataAES.aesEncryption("error/nonTypeRequest", pl.getSecurityKey());
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidKeyException error");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager UnsupportedEncodingException error");
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchPaddingException error");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager NoSuchAlgorithmException error");
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager InvalidAlgorithmParameterException error");
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager BadPaddingException error");
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			System.err.println("ScheduleManager IllegalBlockSizeException error");
+		}
+
+		return result;
+	}
+}

@@ -5,6 +5,7 @@
 <%@ page import="DBConnect.*"%>
 <%@ page import="java.util.Enumeration"%>
 <%@ page import="java.io.FileInputStream" %>
+<%@ page import="jspConnect.*" %>
 <%
 	request.setCharacterEncoding("UTF-8");
 	String imgFile = request.getParameter("imgFile");
@@ -15,6 +16,15 @@
 	//참고 : https://m.blog.naver.com/PostView.nhn?blogId=haengro&logNo=220663411505&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F	
 	//실제경로 구하기  
 	String savePath = this.getServletContext().getRealPath("/")+ "WEB-INF/upload/";
+	
+	
+	//Cross-site Script Check
+			if(type != null) {
+				XSS xss = new XSS();
+				type = xss.prevention(type);			
+			} else {
+				type = "";
+			}
 	
 	if (type.equals("orgShow")) {
 		String returns = imgup.orgShow();
