@@ -7,12 +7,8 @@
 	<classpathentry kind="lib" path="E:/eclipse/jar_files/cos.jar"/>
 	<classpathentry kind="lib" path="E:/eclipse/jar_files/mariadb-java-client-2.5.4.jar"/>
 	<classpathentry kind="lib" path="E:/eclipse/jar_files/jbcrypt-0.3m.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="E:/eclipse/jar_files/json-simple-1.1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v9.0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

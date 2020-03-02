@@ -5,7 +5,7 @@
 <%@ page import="util.DataRSA"%>
 <%@	page import="util.DataAES"%>
 <%@ page import="DBConnect.*"%>
-
+<%@ page import="jspConnect.*" %>
 <%
 	request.setCharacterEncoding("UTF-8");
 	String name = request.getParameter("name");
@@ -17,64 +17,86 @@
 	String type = request.getParameter("type"); //	사용자가 무슨요청을 했는지 구분하는 변수
 	String securityKey = request.getParameter("securitykey"); //	Front-End에서 보내주는 대칭 키
 
-	User user = User.getInstance();
+	PropLoad pl = new PropLoad(securityKey, type);
+	UserManager user = new UserManager(pl);
 
-	String propFile = "C:/Users/securityLab_5/eclipse-workspace/IoT/src/util/PRIVATEkey.properties";
-	Properties props = new Properties();
-	FileInputStream fis = new FileInputStream(propFile);
-	props.load(new java.io.BufferedInputStream(fis));
-
-	String rsaPrivatekey = props.getProperty("key");
-
-	if (rsaPrivatekey != null) {
-		securityKey = DataRSA.rsaDecryption(securityKey, rsaPrivatekey);
-		type = DataAES.aesDecryption(type, securityKey);
+	
+	
+	//Cross-site Script Check
+	if(name != null) {
+		XSS xss = new XSS();
+		name = xss.prevention(name);			
+	} else {
+		name = "";
+	}	
+	if(id != null) {
+		XSS xss = new XSS();
+		id = xss.prevention(id);			
+	} else {
+		id = "";
+	}	
+	if(pwd != null) {
+		XSS xss = new XSS();
+		pwd = xss.prevention(pwd);			
+	} else {
+		pwd = "";
+	}	
+	if(mail != null) {
+		XSS xss = new XSS();
+		mail = xss.prevention(mail);			
+	} else {
+		mail = "";
+	}	
+	if(b_name != null) {
+		XSS xss = new XSS();
+		b_name = xss.prevention(b_name);			
+	} else {
+		b_name = "";
+	}	
+	if(b_id != null) {
+		XSS xss = new XSS();
+		b_id = xss.prevention(b_id);			
+	} else {
+		b_id = "";
+	}	
+	if(type != null) {
+		XSS xss = new XSS();
+		type = xss.prevention(type);
+	} else {
+		type = "";
 	}
-
 	
 	
 	if (type.equals("addUser_List")) {		
-		String returns = user.addUser_List(); //add-user테이블에 추가된 정보 찾기
-		returns = DataAES.aesEncryption(returns, securityKey);
+		String returns = user.addUser_ListCheck();
 		
 		out.clear();
 		out.print(returns);
 		out.flush();
 	
 	} else if (type.equals("user_List")) {
-		name = DataAES.aesDecryption(name, securityKey);
-		id = DataAES.aesDecryption(id, securityKey);
-		
-		String returns = user.user_List(name, id); //추가할 이름, 추가할 아이디
-		returns = DataAES.aesEncryption(returns, securityKey);
+		String returns = user.user_ListCheck(name, id);
 		
 		out.clear();
 		out.print(returns);
 		out.flush();
 		
 	} else if (type.equals("addUser_Add")) {
-		name = DataAES.aesDecryption(name, securityKey);
-		id = DataAES.aesDecryption(id, securityKey);
-		
-		String returns = user.addUser_Add(name, id); //추가할 이름, 추가할 아이디
-		returns = DataAES.aesEncryption(returns, securityKey);
+		String returns = user.addUser_AddCheck(name, id);
 		
 		out.clear();
 		out.print(returns);
 		out.flush();
 		
 	} else if (type.equals("addUser_Delete")) {
-		name = DataAES.aesDecryption(name, securityKey);
-		id = DataAES.aesDecryption(id, securityKey);
-				
-		String returns = user.addUser_Delete(name, id); //삭제할 이름, 삭제할 아이디
-		returns = DataAES.aesEncryption(returns, securityKey);
+		String returns = user.addUser_DeleteCheck(name, id);
 		
 		out.clear();
 		out.print(returns);
 		out.flush();
 		
-	} /*
+	} 
+	/*
 		else if (type.equals("user_Modify")) {	//add_user와 user 수정을 할 때 모두 이 메소드를 이용
 		String returns = user.user_Modify(b_name, b_id, name, id, pwd, mail); //수정전 id,name - 수정후id,name,pwd
 		out.clear();
@@ -82,12 +104,10 @@
 		out.flush();
 		}*/
 	else {
-		String returns = "error/nonTypeRequest";
-		returns = DataAES.aesEncryption(returns, securityKey);
+		String returns = user.userError();
 		
 		out.clear();
 		out.print(returns);
 		out.flush();
-		
 	}
 %>
