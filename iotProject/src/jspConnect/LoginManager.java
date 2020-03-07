@@ -25,11 +25,30 @@ public class LoginManager {
 	private String mail;
 	private String result;
 	
-	public LoginManager(PropLoad pl) {
+	public LoginManager(PropLoad pl, String name, String id, String pwd, String b_pwd, String mail) {
 		this.pl = pl;
+		
+		if(pl.getType().equals("adminLogin")) {
+			adminLoginCheck(id);
+		}
+		else if(pl.getType().equals("login")) {
+			loginCheck(id, name);
+		}
+		else if(pl.getType().equals("join")) {
+			joinCheck(id, name, pwd, mail);
+		}
+		else if(pl.getType().equals("find")) {
+			findCheck(id, name, mail);
+		}
+		else if(pl.getType().equals("")) {
+			changeCheck(id, pwd, b_pwd);
+		}
+		else {
+			loginError();
+		}
 	}
 	
-	public String adminLoginCheck(String id) {
+	public void adminLoginCheck(String id) {
 		try {
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
 					
@@ -66,7 +85,6 @@ public class LoginManager {
 			System.err.println("LoginManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
 	public String loginCheck(String id, String name) {
@@ -117,7 +135,7 @@ public class LoginManager {
 		return result;
 	}
 	
-	public String joinCheck(String id, String name, String pwd, String mail) {
+	public void joinCheck(String id, String name, String pwd, String mail) {
 		try {
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
@@ -177,10 +195,9 @@ public class LoginManager {
 			System.err.println("LoginManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String findCheck(String id, String name, String mail) {
+	public void findCheck(String id, String name, String mail) {
 		try {
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
@@ -233,10 +250,9 @@ public class LoginManager {
 			System.err.println("LoginManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String changeCheck(String id, String pwd, String b_pwd) {
+	public void changeCheck(String id, String pwd, String b_pwd) {
 		try {
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
 			this.b_pwd = DataAES.aesDecryption(b_pwd, pl.getSecurityKey());
@@ -289,10 +305,9 @@ public class LoginManager {
 			System.err.println("LoginManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String loginError() {
+	public void loginError() {
 		try {
 			result = DataAES.aesEncryption("error/nonTypeRequest", pl.getSecurityKey());
 		} catch (InvalidKeyException e) {
@@ -317,7 +332,9 @@ public class LoginManager {
 			// TODO Auto-generated catch block
 			System.err.println("LoginManager IllegalBlockSizeException error");
 		}
-
+	}
+	
+	public String getResult() {
 		return result;
 	}
 }

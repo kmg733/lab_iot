@@ -20,18 +20,31 @@ public class UserManager {
 	//	º¯¼öµé
 	private String name;
 	private String id;
-	private String pwd;
-	private String mail;
-	private String b_name;
-	private String b_id;
 	private String result;
 	
-	public UserManager(PropLoad pl) {
+	public UserManager(PropLoad pl, String name, String id, String pwd, String mail,
+			String b_name, String b_id) {
 		this.pl = pl;
+		
+		if(pl.getType().equals("addUser_List")) {
+			addUser_ListCheck();
+		}
+		else if(pl.getType().equals("user_List")) {
+			user_ListCheck(name, id);
+		}
+		else if(pl.getType().equals("addUser_Add")) {
+			addUser_AddCheck(name, id);
+		}
+		else if(pl.getType().equals("addUser_Delete")) {
+			addUser_DeleteCheck(name, id);
+		}
+		else {
+			userError();
+		}
 	}
 	
 	
-	public String addUser_ListCheck() {
+	public void addUser_ListCheck() {
 		try {
 			
 			result = user.addUser_List();
@@ -61,10 +74,9 @@ public class UserManager {
 			System.err.println("UserManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String user_ListCheck(String name, String id) {
+	public void user_ListCheck(String name, String id) {
 		try {
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
@@ -110,10 +122,9 @@ public class UserManager {
 			System.err.println("UserManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String addUser_AddCheck(String name, String id) {
+	public void addUser_AddCheck(String name, String id) {
 		try {
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
@@ -159,10 +170,9 @@ public class UserManager {
 			System.err.println("UserManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String addUser_DeleteCheck(String name, String id) {
+	public void addUser_DeleteCheck(String name, String id) {
 		try {
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
@@ -208,10 +218,9 @@ public class UserManager {
 			System.err.println("UserManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String userError() {
+	public void userError() {
 		try {
 			result = DataAES.aesEncryption("error/nonTypeRequest", pl.getSecurityKey());
 		} catch (InvalidKeyException e) {
@@ -237,6 +246,9 @@ public class UserManager {
 			System.err.println("UserManager IllegalBlockSizeException error");
 		}
 
+	}
+	
+	public String getResult() {
 		return result;
 	}
 }

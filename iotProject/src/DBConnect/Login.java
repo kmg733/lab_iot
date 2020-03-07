@@ -9,8 +9,10 @@ import java.util.Properties;
 import java.util.Random;
 
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -311,7 +313,6 @@ public class Login { // 로그인 회원가입 관리
 
 					String recipient = ""; // 받는 사람의 메일주소를 입력해주세요.
 					recipient = rs.getString("mail");
-					System.out.println("mail = " + recipient);
 					String subject = "변경된 비밀번호 입니다."; // 메일 제목 입력해주세요.
 					String body = "비밀번호는 " + rePwd + " 입니다."; // 메일 내용 입력해주세요.
 					Properties props = System.getProperties(); // 정보를 담기 위한 객체 생성
@@ -334,18 +335,24 @@ public class Login { // 로그인 회원가입 관리
 					session.setDebug(true); // for debug
 					Message mimeMessage = new MimeMessage(session);
 					// MimeMessage 생성
-					try {
-						mimeMessage.setFrom(new InternetAddress(em.getEmailId() + "@naver.com"));
-						// 발신자 셋팅 , 보내는 사람의 이메일주소를 한번 더 입력합니다. 이때는 이메일 풀 주소를 다 작성해주세요.
-						mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-						// 수신자셋팅 //.TO 외에 .CC(참조) .BCC(숨은참조) 도 있음
-						mimeMessage.setSubject(subject); // 제목셋팅
-						mimeMessage.setText(body); // 내용셋팅
-						Transport.send(mimeMessage); // javax.mail.Transport.send() 이용
-					} catch (Exception e) {
-						e.printStackTrace();
-						returns = "emailSendFailed";
-					}
+						try {
+							mimeMessage.setFrom(new InternetAddress(em.getEmailId() + "@naver.com"));
+							// 발신자 셋팅 , 보내는 사람의 이메일주소를 한번 더 입력합니다. 이때는 이메일 풀 주소를 다 작성해주세요.
+							mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+							// 수신자셋팅 //.TO 외에 .CC(참조) .BCC(숨은참조) 도 있음
+							mimeMessage.setSubject(subject); // 제목셋팅
+							mimeMessage.setText(body); // 내용셋팅
+							Transport.send(mimeMessage); // javax.mail.Transport.send() 이용
+						} catch (AddressException e) {
+							// TODO Auto-generated catch block
+							System.err.println("Login findPW AddressException error");
+							returns = "emailSendFailed";
+						} catch (MessagingException e) {
+							// TODO Auto-generated catch block
+							System.err.println("Login findPW MessagingException error");
+							returns = "emailSendFailed";
+						}
+						
 					returns = "emailSendSuccess";
 				} else { // user 데이터베이스에 해당 데이터가 없을 때
 					returns = "userNotExist";

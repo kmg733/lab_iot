@@ -26,11 +26,29 @@ public class MemberStateManager {
 	private String beforePhone;	
 	private String result;
 	
-	public MemberStateManager(PropLoad pl) {
+	public MemberStateManager(PropLoad pl, String name, String phone, String dept, String team,
+			 String beforeName, String beforePhone) {
 		this.pl = pl;
+		
+		if(pl.getType().equals("memShow")) {
+			memShowCheck();
+		}
+		else if(pl.getType().equals("memAdd")) {
+			memAddCheck(name, phone, dept, team);
+		}
+		else if(pl.getType().equals("memModify")) {
+			memModifyCheck(beforeName, beforePhone, name, phone, dept, team);
+		}
+		else if(pl.getType().equals("memDelete")) {
+			memDeleteCheck(name, phone, dept, team);
+		}
+		else {
+			memberError();
+		}
+		
 	}
 
-	public String memShowCheck() {
+	public void memShowCheck() {
 		try {
 			result = mem.memShow();
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -59,10 +77,9 @@ public class MemberStateManager {
 			System.err.println("MemberStateManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String memAddCheck(String name, String phone, String dept, String team) {
+	public void memAddCheck(String name, String phone, String dept, String team) {
 		try {
 			
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
@@ -124,10 +141,10 @@ public class MemberStateManager {
 			System.err.println("MemberStateManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String memModifyCheck(String beforeName, String beforePhone, String name, String phone, String dept, String team) {
+	public void memModifyCheck(String beforeName, String beforePhone, String name,
+			String phone, String dept, String team) {
 		try {
 			
 			this.beforeName = DataAES.aesDecryption(beforeName, pl.getSecurityKey());
@@ -202,10 +219,9 @@ public class MemberStateManager {
 			System.err.println("MemberStateManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String memDeleteCheck(String name, String phone, String dept, String team) {
+	public void memDeleteCheck(String name, String phone, String dept, String team) {
 		try {
 			
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
@@ -266,10 +282,9 @@ public class MemberStateManager {
 			System.err.println("MemberStateManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String memberError() {
+	public void memberError() {
 		try {
 			result = DataAES.aesEncryption("error/nonTypeRequest", pl.getSecurityKey());
 		} catch (InvalidKeyException e) {
@@ -295,6 +310,9 @@ public class MemberStateManager {
 			System.err.println("MemberStateManager IllegalBlockSizeException error");
 		}
 
+	}
+	
+	public String getResult() {
 		return result;
 	}
 }

@@ -21,11 +21,21 @@ public class RuleManager {
 	private String text;
 	private String result;
 	
-	public RuleManager(PropLoad pl) {
+	public RuleManager(PropLoad pl, String text) {
 		this.pl = pl;
+		
+		if(pl.getType().equals("ruleShow")) {
+			ruleShowCheck();
+		}
+		else if(pl.getType().equals("ruleAdd")) {
+			ruleAddCheck(text);
+		}
+		else {
+			ruleError();
+		}
 	}
 	
-	public String ruleShowCheck() {
+	public void ruleShowCheck() {
 		try {
 			result = rule.ruleShow();
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -54,10 +64,9 @@ public class RuleManager {
 			System.err.println("RuleManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}	
 	
-	public String ruleAddCheck(String text) {
+	public void ruleAddCheck(String text) {
 		try {
 			
 			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
@@ -97,10 +106,9 @@ public class RuleManager {
 			System.err.println("RuleManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}	
 	
-	public String ruleError() {
+	public void ruleError() {
 		try {
 			result = DataAES.aesEncryption("error/nonTypeRequest", pl.getSecurityKey());
 		} catch (InvalidKeyException e) {
@@ -126,6 +134,9 @@ public class RuleManager {
 			System.err.println("RuleManager IllegalBlockSizeException error");
 		}
 
+	}
+	
+	public String getResult() {
 		return result;
 	}
 }

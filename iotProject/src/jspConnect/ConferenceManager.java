@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.servlet.http.HttpServletRequest;
 
 import DBConnect.Conference;
 import util.DataAES;
@@ -16,16 +17,29 @@ public class ConferenceManager {
 	//	필요한 객체
 	private Conference conf = Conference.getInstance();;
 	private PropLoad pl;
+	private HttpServletRequest hsr;
 	
 	//	변수들
 	private String date;
 	private String text;
 	private String result;
-	public ConferenceManager(PropLoad pl) {
+	//private String returns;
+	
+	public ConferenceManager(PropLoad pl, String date, String text) {
 		this.pl = pl;
+		
+		if(pl.getType().equals("cfShow")) {
+			cfShowCheck(date);
+		}
+		else if(pl.getType().equals("cfAdd")) {
+			cfAddCheck(date, text);
+		}
+		else{
+			cfError();
+		}
 	}
-
-	public String cfShowCheck(String date) {
+	
+	public void cfShowCheck(String date) {
 		try {
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 			
@@ -63,10 +77,9 @@ public class ConferenceManager {
 			System.err.println("ConferenceManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 
-	public String cfAddCheck(String date, String text) {
+	public void cfAddCheck(String date, String text) {
 		try {
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
@@ -110,10 +123,9 @@ public class ConferenceManager {
 			System.err.println("ConferenceManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String cfError() {
+	public void cfError() {
 		try {
 			result = DataAES.aesEncryption("error/nonTypeRequest", pl.getSecurityKey());
 		} catch (InvalidKeyException e) {
@@ -139,6 +151,9 @@ public class ConferenceManager {
 			System.err.println("ConferenceManager IllegalBlockSizeException error");
 		}
 
+	}
+	
+	public String getResult() {
 		return result;
 	}
 }

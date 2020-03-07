@@ -15,53 +15,26 @@
 		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수		
 		String securityKey = request.getParameter("securitykey"); //	Front-End에서 보내주는 대칭 키
 		
+		if(title.equals(null)){
+			title = "";
+		}
+		if(b_title.equals(null)){
+			b_title = "";
+		}
+		if(text.equals(null)){
+			text = "";
+		}
+		if(date.equals(null)){
+			date = "";
+		}
+		
 		PropLoad pl = new PropLoad(securityKey, type);
-		ScheduleManager sche = new ScheduleManager(pl);
+		ScheduleManager sche = new ScheduleManager(pl, title, b_title, text, date);
 
 		
-		
-		if(type.equals("scheduleList")) {
-			String returns = sche.scheduleListCheck(date);
-			
-			out.clear();
-			out.print(returns);
-			out.flush();
-		}
-		else if(type.equals("scheduleAdd")) {	
-			String returns = sche.scheduleAddCheck(title, text, date);
-			
-			out.clear();
-			out.print(returns);
-			out.flush();			
-		}
-		else if(type.equals("scheduleShow")) {
-			String returns = sche.scheduleShowCheck(title, date);
-			
-			out.clear();
-			out.print(returns);
-			out.flush();
-		}
-		
-		else if(type.equals("scheduleDelete")) {
-			String returns = sche.scheduleDeleteCheck(title, date);
-			
-			out.clear();
-			out.print(returns);
-			out.flush();
-		}
-		else if(type.equals("scheduleModify")) {
-			String returns = sche.scheduleModifyCheck(b_title, title, text, date);
-			
-			out.clear();
-			out.print(returns);
-			out.flush();
-		}
+		String returns = sche.getResult();
+		out.clear();
+		out.print(returns);
+		out.flush();
 
-		else {
-			String returns = sche.scheduleError();
-			
-			out.clear();
-			out.print(returns);
-			out.flush();
-		}
 %>
