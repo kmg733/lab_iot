@@ -24,11 +24,30 @@ public class ScheduleManager {
 	private String date;	
 	private String result;
 	
-	public ScheduleManager(PropLoad pl) {
+	public ScheduleManager(PropLoad pl, String title, String b_title, String text, String date) {
 		this.pl = pl;
+		
+		if(pl.getType().equals("scheduleList")) {
+			scheduleListCheck(date);
+		}
+		else if(pl.getType().equals("scheduleAdd")) {
+			scheduleAddCheck(title, text, date);
+		}
+		else if(pl.getType().equals("scheduleShow")) {
+			scheduleShowCheck(title, date);
+		}
+		else if(pl.getType().equals("scheduleDelete")) {
+			scheduleDeleteCheck(title, date);
+		}
+		else if(pl.getType().equals("scheduleModify")) {
+			scheduleModifyCheck(b_title, title, text, date);
+		}
+		else {
+			scheduleError();
+		}
 	}
 	
-	public String scheduleListCheck(String date) {
+	public void scheduleListCheck(String date) {
 		try {
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 			
@@ -68,10 +87,9 @@ public class ScheduleManager {
 			System.err.println("ScheduleManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String scheduleAddCheck(String title, String text, String date) {
+	public void scheduleAddCheck(String title, String text, String date) {
 		try {
 			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
 			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
@@ -125,10 +143,9 @@ public class ScheduleManager {
 			System.err.println("ScheduleManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String scheduleShowCheck(String title, String date) {
+	public void scheduleShowCheck(String title, String date) {
 		try {
 			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
@@ -175,10 +192,9 @@ public class ScheduleManager {
 			System.err.println("ScheduleManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String scheduleDeleteCheck(String title, String date) {
+	public void scheduleDeleteCheck(String title, String date) {
 		try {
 			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
@@ -225,10 +241,9 @@ public class ScheduleManager {
 			System.err.println("ScheduleManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String scheduleModifyCheck(String b_title, String title, String text, String date) {
+	public void scheduleModifyCheck(String b_title, String title, String text, String date) {
 		try {
 			this.b_title = DataAES.aesDecryption(b_title, pl.getSecurityKey());
 			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
@@ -289,10 +304,9 @@ public class ScheduleManager {
 			System.err.println("ScheduleManager IllegalBlockSizeException error");
 		}
 		
-		return result;
 	}
 	
-	public String scheduleError() {
+	public void scheduleError() {
 		try {
 			result = DataAES.aesEncryption("error/nonTypeRequest", pl.getSecurityKey());
 		} catch (InvalidKeyException e) {
@@ -318,6 +332,9 @@ public class ScheduleManager {
 			System.err.println("ScheduleManager IllegalBlockSizeException error");
 		}
 
+	}
+	
+	public String getResult() {
 		return result;
 	}
 }
