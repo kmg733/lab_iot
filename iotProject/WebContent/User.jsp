@@ -5,7 +5,7 @@
 <%@ page import="util.DataRSA"%>
 <%@	page import="util.DataAES"%>
 <%@ page import="DBConnect.*"%>
-<%@ page import="jspConnect.*" %>
+<%@ page import="jspConnect.*"%>
 <%
 	request.setCharacterEncoding("UTF-8");
 	String name = request.getParameter("name");
@@ -17,30 +17,43 @@
 	String type = request.getParameter("type"); //	사용자가 무슨요청을 했는지 구분하는 변수
 	String securityKey = request.getParameter("securitykey"); //	Front-End에서 보내주는 대칭 키
 
-	if(name.equals(null)){
+	//Cross-site Script Check
+	XSS xss = new XSS();
+	if (name != null) {
+		name = xss.prevention(name);
+	} else {
 		name = "";
 	}
-	if(id.equals(null)){
+	if (id != null) {
+		id = xss.prevention(id);
+	} else {
 		id = "";
 	}
-	if(pwd.equals(null)){
+	if (pwd != null) {
+		pwd = xss.prevention(pwd);
+	} else {
 		pwd = "";
 	}
-	if(mail.equals(null)){
+	if (mail != null) {
+		mail = xss.prevention(mail);
+	} else {
 		mail = "";
 	}
-	if(b_name.equals(null)){
+	if (b_name != null) {
+		b_name = xss.prevention(b_name);
+	} else {
 		b_name = "";
 	}
-	if(b_id.equals(null)){
+	if (b_id != null) {
+		b_id = xss.prevention(b_id);
+	} else {
 		b_id = "";
 	}
-	
+
 	
 	PropLoad pl = new PropLoad(securityKey, type);
 	UserManager user = new UserManager(pl, name, id, pwd, mail, b_name, b_id);
-	
-	
+
 	String returns = user.getResult();
 	out.clear();
 	out.print(returns);

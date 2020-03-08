@@ -90,16 +90,6 @@ public class ImageUploadManager {
 		try {
 			this.imgFile = DataAES.aesDecryption(imgFile, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			
-			/*
-			if(imgFile != null) {
-				XSS xss = new XSS();
-				imgFile = xss.prevention(imgFile);			
-			} else {
-				imgFile = "";
-			}	
-			*/
 			
 			result = imgup.orgUpload(this.savePath, this.imgFile);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -166,16 +156,6 @@ public class ImageUploadManager {
 		try {
 			this.imgFile = DataAES.aesDecryption(imgFile, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			
-			/*
-			if(imgFile != null) {
-				XSS xss = new XSS();
-				imgFile = xss.prevention(imgFile);			
-			} else {
-				imgFile = "";
-			}	
-			*/
 			
 			result = imgup.strUpload(this.savePath, this.imgFile);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -242,16 +222,6 @@ public class ImageUploadManager {
 		try {
 			this.imgFile = DataAES.aesDecryption(imgFile, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			
-			/*
-			if(imgFile != null) {
-				XSS xss = new XSS();
-				imgFile = xss.prevention(imgFile);			
-			} else {
-				imgFile = "";
-			}	
-			*/
 			
 			result = imgup.ipUpload(this.savePath, this.imgFile);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());

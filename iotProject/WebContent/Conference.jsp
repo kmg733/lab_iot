@@ -9,12 +9,19 @@
 		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수
 		String securityKey = request.getParameter("securitykey"); //	Front-End에서 보내주는 대칭 키
 
-		if(date.equals(null)){
+		//Cross-site Script Check
+		XSS xss = new XSS();
+		if(date != null) {
+			date = xss.prevention(date);			
+		} else {
 			date = "";
-		}
-		if(text.equals(null)){
+		}	
+		if(text != null) {
+			text = xss.prevention(text);			
+		} else {
 			text = "";
-		}
+		}	
+		
 		
 		PropLoad pl = new PropLoad(securityKey, type);
 		ConferenceManager cfm = new ConferenceManager(pl, date, text);

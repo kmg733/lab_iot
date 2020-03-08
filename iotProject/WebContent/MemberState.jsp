@@ -17,24 +17,39 @@
 		String type = request.getParameter("type");	//	사용자가 무슨요청을 했는지 구분하는 변수
 		String securityKey = request.getParameter("securitykey"); //	Front-End에서 보내주는 대칭 키
 		
-		if(name.equals(null)){
+		//Cross-site Script Check
+		XSS xss = new XSS();
+		if(name != null) {
+			name = xss.prevention(name);			
+		} else {
 			name = "";
 		}
-		if(phone.equals(null)){
+		if(phone != null) {
+			phone = xss.prevention(phone);			
+		} else {
 			phone = "";
 		}
-		if(dept.equals(null)){
+		if(dept != null) {
+			dept = xss.prevention(dept);			
+		} else {
 			dept = "";
 		}
-		if(team.equals(null)){
+		if(team != null) {
+			team = xss.prevention(team);			
+		} else {
 			team = "";
 		}
-		if(beforeName.equals(null)){
+		if(beforeName != null) {
+			beforeName = xss.prevention(beforeName);			
+		} else {
 			beforeName = "";
 		}
-		if(beforePhone.equals(null)){
+		if(beforePhone != null) {
+			beforePhone = xss.prevention(beforePhone);			
+		} else {
 			beforePhone = "";
 		}
+		
 		
 		PropLoad pl = new PropLoad(securityKey, type);
 		MemberStateManager mem = new MemberStateManager(pl, name, phone, dept, 
