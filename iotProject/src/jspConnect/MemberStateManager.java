@@ -87,32 +87,6 @@ public class MemberStateManager {
 			this.dept = DataAES.aesDecryption(dept, pl.getSecurityKey());		
 			this.team = DataAES.aesDecryption(team, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(name != null) {
-				XSS xss = new XSS();
-				name = xss.prevention(name);			
-			} else {
-				name = "";
-			}
-			if(phone != null) {
-				XSS xss = new XSS();
-				phone = xss.prevention(phone);
-			} else {
-				phone = "";
-			}		
-			if(dept != null) {
-				XSS xss = new XSS();
-				dept = xss.prevention(dept);
-			} else {
-				dept = "";
-			}
-			if(team != null) {
-				XSS xss = new XSS();
-				team = xss.prevention(team);
-			} else {
-				team = "";
-			}		
-			
 			
 			result = mem.memAdd(this.name, this.phone, this.dept, this.team);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -154,44 +128,7 @@ public class MemberStateManager {
 			this.dept = DataAES.aesDecryption(dept, pl.getSecurityKey());		
 			this.team = DataAES.aesDecryption(team, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(name != null) {
-				XSS xss = new XSS();
-				name = xss.prevention(name);			
-			} else {
-				name = "";
-			}
-			if(phone != null) {
-				XSS xss = new XSS();
-				phone = xss.prevention(phone);
-			} else {
-				phone = "";
-			}		
-			if(dept != null) {
-				XSS xss = new XSS();
-				dept = xss.prevention(dept);
-			} else {
-				dept = "";
-			}
-			if(team != null) {
-				XSS xss = new XSS();
-				team = xss.prevention(team);
-			} else {
-				team = "";
-			}		
-			if(beforeName != null) {
-				XSS xss = new XSS();
-				beforeName = xss.prevention(beforeName);
-			} else {
-				beforeName = "";
-			}		
-			if(beforePhone != null) {
-				XSS xss = new XSS();
-				beforePhone = xss.prevention(beforePhone);
-			} else {
-				beforePhone = "";
-			}	
-			
+
 			result = mem.memModify(this.beforeName, this.beforePhone, this.name, this.phone, this.dept, this.team);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
 			
@@ -229,31 +166,6 @@ public class MemberStateManager {
 			this.dept = DataAES.aesDecryption(dept, pl.getSecurityKey());		
 			this.team = DataAES.aesDecryption(team, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(name != null) {
-				XSS xss = new XSS();
-				name = xss.prevention(name);			
-			} else {
-				name = "";
-			}
-			if(phone != null) {
-				XSS xss = new XSS();
-				phone = xss.prevention(phone);
-			} else {
-				phone = "";
-			}		
-			if(dept != null) {
-				XSS xss = new XSS();
-				dept = xss.prevention(dept);
-			} else {
-				dept = "";
-			}
-			if(team != null) {
-				XSS xss = new XSS();
-				team = xss.prevention(team);
-			} else {
-				team = "";
-			}	
 			
 			result = mem.memDelete(this.name, this.phone, this.dept, this.team);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());

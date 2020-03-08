@@ -16,21 +16,33 @@
 	String type = request.getParameter("type"); //	사용자가 무슨요청을 했는지 구분하는 변수
 	String securityKey = request.getParameter("securitykey"); //	Front-End에서 보내주는 대칭 키
 
-	if(name.equals(null)){
+	//Cross-site Script Check
+	XSS xss = new XSS();
+	if(name != null) {
+		name = xss.prevention(name);			
+	} else {
 		name = "";
-	}
-	if(id.equals(null)){
+	}	
+	if(id != null) {
+		id = xss.prevention(id);			
+	} else {
 		id = "";
-	}
-	if(pwd.equals(null)){
+	}	
+	if(pwd != null) {
+		pwd = xss.prevention(pwd);			
+	} else {
 		pwd = "";
-	}
-	if(b_pwd.equals(null)){
+	}	
+	if(name != null) {
+		b_pwd = xss.prevention(b_pwd);			
+	} else {
 		b_pwd = "";
-	}
-	if(mail.equals(null)){
+	}	
+	if(name != null) {
+		mail = xss.prevention(mail);			
+	} else {
 		mail = "";
-	}
+	}	
 	
 	
 	PropLoad pl = new PropLoad(securityKey, type);

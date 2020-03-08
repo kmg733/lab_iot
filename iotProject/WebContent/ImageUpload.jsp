@@ -12,9 +12,13 @@
 	String type = request.getParameter("type"); //	사용자가 무슨요청을 했는지 구분하는 변수
 	String securityKey = request.getParameter("securitykey"); //	Front-End에서 보내주는 대칭 키
 
-	if(imgFile.equals(null)) {
+	//Cross-site Script Check
+	XSS xss = new XSS();
+	if(imgFile != null) {
+		imgFile = xss.prevention(imgFile);			
+	} else {
 		imgFile = "";
-	}
+	}	
 	
 	
 	PropLoad pl = new PropLoad(securityKey, type);

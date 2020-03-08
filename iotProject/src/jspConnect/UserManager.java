@@ -81,20 +81,6 @@ public class UserManager {
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(name != null) {
-				XSS xss = new XSS();
-				name = xss.prevention(name);			
-			} else {
-				name = "";
-			}	
-			if(id != null) {
-				XSS xss = new XSS();
-				id = xss.prevention(id);			
-			} else {
-				id = "";
-			}	
-			
 			result = user.user_List(this.name, this.id);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
 			
@@ -129,19 +115,7 @@ public class UserManager {
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(name != null) {
-				XSS xss = new XSS();
-				name = xss.prevention(name);			
-			} else {
-				name = "";
-			}	
-			if(id != null) {
-				XSS xss = new XSS();
-				id = xss.prevention(id);			
-			} else {
-				id = "";
-			}	
+			
 			
 			result = user.addUser_Add(this.name, this.id);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -177,19 +151,7 @@ public class UserManager {
 			this.name = DataAES.aesDecryption(name, pl.getSecurityKey());
 			this.id = DataAES.aesDecryption(id, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(name != null) {
-				XSS xss = new XSS();
-				name = xss.prevention(name);			
-			} else {
-				name = "";
-			}	
-			if(id != null) {
-				XSS xss = new XSS();
-				id = xss.prevention(id);			
-			} else {
-				id = "";
-			}	
+			
 			
 			result = user.addUser_Delete(this.name, this.id);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());

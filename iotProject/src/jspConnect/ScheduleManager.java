@@ -51,15 +51,6 @@ public class ScheduleManager {
 		try {
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(date != null) {
-				XSS xss = new XSS();
-				date = xss.prevention(date);			
-			} else {
-				date = "";
-			}	
-			
-			
 			result = sche.scheduleList(this.date);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
 			
@@ -95,26 +86,6 @@ public class ScheduleManager {
 			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 
-			//Cross-site Script Check
-			if(title != null) {
-				XSS xss = new XSS();
-				title = xss.prevention(title);			
-			} else {
-				title = "";
-			}	
-			if(text != null) {
-				XSS xss = new XSS();
-				text = xss.prevention(text);			
-			} else {
-				text = "";
-			}	
-			if(date != null) {
-				XSS xss = new XSS();
-				date = xss.prevention(date);			
-			} else {
-				date = "";
-			}	
-			
 			
 			result = sche.scheduleAdd(this.title, this.text, this.date);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -150,20 +121,6 @@ public class ScheduleManager {
 			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 
-			//Cross-site Script Check
-			if(title != null) {
-				XSS xss = new XSS();
-				title = xss.prevention(title);			
-			} else {
-				date = "";
-			}	
-			if(date != null) {
-				XSS xss = new XSS();
-				date = xss.prevention(date);			
-			} else {
-				date = "";
-			}	
-			
 			
 			result = sche.scheduleAdd(this.title, this.text, this.date);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -199,21 +156,7 @@ public class ScheduleManager {
 			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 
-			//Cross-site Script Check
-			if(title != null) {
-				XSS xss = new XSS();
-				title = xss.prevention(title);			
-			} else {
-				date = "";
-			}	
-			if(date != null) {
-				XSS xss = new XSS();
-				date = xss.prevention(date);			
-			} else {
-				date = "";
-			}	
-			
-			
+
 			result = sche.scheduleDelete(this.title, this.date);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
 			
@@ -250,32 +193,6 @@ public class ScheduleManager {
 			this.title = DataAES.aesDecryption(title, pl.getSecurityKey());			
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 
-			//Cross-site Script Check
-			if(b_title != null) {
-				XSS xss = new XSS();
-				b_title = xss.prevention(b_title);			
-			} else {
-				b_title = "";
-			}	
-			if(text != null) {
-				XSS xss = new XSS();
-				text = xss.prevention(text);			
-			} else {
-				text = "";
-			}	
-			if(title != null) {
-				XSS xss = new XSS();
-				title = xss.prevention(title);			
-			} else {
-				date = "";
-			}	
-			if(date != null) {
-				XSS xss = new XSS();
-				date = xss.prevention(date);			
-			} else {
-				date = "";
-			}	
-			
 			
 			result = sche.scheduleModify(this.b_title, this.title, this.text, this.date);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());

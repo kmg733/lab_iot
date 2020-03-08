@@ -71,13 +71,6 @@ public class RuleManager {
 			
 			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(text != null) {
-				XSS xss = new XSS();
-				text = xss.prevention(text);			
-			} else {
-				text = "";
-			}	
 			
 			result = rule.ruleAdd(this.text);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());

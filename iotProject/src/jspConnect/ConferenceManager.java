@@ -43,13 +43,6 @@ public class ConferenceManager {
 		try {
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 			
-			//Cross-site Script Check
-			if(date != null) {
-				XSS xss = new XSS();
-				date = xss.prevention(date);			
-			} else {
-				date = "";
-			}		
 			
 			result = conf.cfShow(this.date);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
@@ -83,20 +76,7 @@ public class ConferenceManager {
 		try {
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 			this.text = DataAES.aesDecryption(text, pl.getSecurityKey());
-			
-			//Cross-site Script Check
-			if(date != null) {
-				XSS xss = new XSS();
-				date = xss.prevention(date);			
-			} else {
-				date = "";
-			}		
-			if(text != null) {
-				XSS xss = new XSS();
-				text = xss.prevention(text);
-			} else {
-				date = "";
-			}		
+				
 			
 			result = conf.cfAdd(this.date, this.text);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
