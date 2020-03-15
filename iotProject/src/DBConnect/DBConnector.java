@@ -85,9 +85,14 @@ public class DBConnector { // DB접근제어
 
 	public Connection getConn() {
 		try {
+			Class.forName("org.mariadb.jdbc.Driver");
 			return DriverManager.getConnection(dbURL, dbID, dbPassword);
 		} catch (SQLException e) {
 			System.err.println("DBconnectorIoT Connection error");
+			return null;
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.err.println("DBConnector  ClassNotFoundException error");
 			return null;
 		}
 	}
