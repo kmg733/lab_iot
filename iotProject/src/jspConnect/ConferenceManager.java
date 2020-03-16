@@ -8,7 +8,6 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.servlet.http.HttpServletRequest;
 
 import DBConnect.Conference;
 import util.DataAES;
@@ -17,7 +16,6 @@ public class ConferenceManager {
 	//	필요한 객체
 	private Conference conf = Conference.getInstance();;
 	private PropLoad pl;
-	private HttpServletRequest hsr;
 	
 	//	변수들
 	private String date;

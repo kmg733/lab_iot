@@ -262,7 +262,7 @@ public class User { // 회원 정보 관리
 					pstmt2.executeUpdate(); // db에 쿼리문 입력
 
 					sql3 = "delete from add_user where id=? and name=?"; // add_user 테이블에 id와 name에 해당되는 레코드 삭제
-					pstmt3 = conn.prepareStatement(sql2);
+					pstmt3 = conn.prepareStatement(sql3);
 					pstmt3.setString(1, id);
 					pstmt3.setString(2, name);
 					pstmt3.executeUpdate(); // db에 쿼리문 입력
