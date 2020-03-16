@@ -15,12 +15,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import util.DBAES;
+import util.DataAES;
 
 public class DBConnector { // DB접근제어
-	private Connection conn;
-	private DBAES aes;
-	
 	// DB접속
 	private String dbURL = "jdbc:mariadb://localhost:3306/securitylab_andb?serverTimezone=UTC"; // db주소
 	private String dbID = "root"; // db아이디
@@ -43,15 +40,8 @@ public class DBConnector { // DB접근제어
 			Properties key = new Properties();
 			key_fis = new FileInputStream(read_key);
 			key.load(new java.io.BufferedInputStream(key_fis));
-
-			String aes_key = key.getProperty("key");
-			if (aes_key != null) {
-				aes = new DBAES(aes_key); // 암호화에 사용할 키 전달
-			}
-
-			if (aes != null) {
-				dbPassword = aes.aesDecode(props.getProperty("password")); // 복호화
-			}
+			
+			dbPassword = DataAES.aesDecryption(props.getProperty("password"), key.getProperty("key"));
 
 		} catch (FileNotFoundException e) {// 예외처리 ,대응부재 제거
 			System.err.println("CommDAO FileNotFoundException error");

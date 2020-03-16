@@ -14,7 +14,7 @@ import DBConnect.ImageUpload;
 import util.DataAES;
 
 public class ImageUploadManager {
-//	필요한 객체
+	//	필요한 객체
 	private ImageUpload imgup = ImageUpload.getInstance();;
 	private PropLoad pl;
 	
@@ -24,7 +24,7 @@ public class ImageUploadManager {
 	
 	//	이미지 저장을 위한 파일경로 지정
 	private	File file = new File(".");
-	private String savePath = file.getAbsoluteFile().toString() + "IoT/WEB-INF/upload/";
+	private String savePath = "C:/Users/securityLab_5/eclipse-worspace/IoT/WebContent/WEB-INF/upload/";
 	
 	
 	public ImageUploadManager(PropLoad pl, String imgFile) {
@@ -34,19 +34,19 @@ public class ImageUploadManager {
 			orgShowCheck();
 		}
 		else if(pl.getType().equals("orgUpload")) {
-			orgUploadCheck(savePath, imgFile);
+			orgUploadCheck(imgFile);
 		}
 		else if(pl.getType().equals("strShow")) {
 			strShowCheck();
 		}
 		else if(pl.getType().equals("strUpload")) {
-			strUploadCheck(savePath, imgFile);
+			strUploadCheck(imgFile);
 		}
 		else if(pl.getType().equals("ipShow")) {
 			ipShowCheck();
 		}
 		else if(pl.getType().equals("ipUpload")) {
-			ipUploadCheck(savePath, imgFile);
+			ipUploadCheck(imgFile);
 		}
 		else {
 			imgError();
@@ -86,7 +86,7 @@ public class ImageUploadManager {
 		
 	}
 	
-	public void orgUploadCheck(String savePath, String imgFile) {
+	public void orgUploadCheck(String imgFile) {
 		try {
 			this.imgFile = DataAES.aesDecryption(imgFile, pl.getSecurityKey());
 			
@@ -152,7 +152,7 @@ public class ImageUploadManager {
 		
 	}
 	
-	public void strUploadCheck(String savePath, String imgFile) {
+	public void strUploadCheck( String imgFile) {
 		try {
 			this.imgFile = DataAES.aesDecryption(imgFile, pl.getSecurityKey());
 			
@@ -218,7 +218,7 @@ public class ImageUploadManager {
 		
 	}
 	
-	public void ipUploadCheck(String savePath, String imgFile) {
+	public void ipUploadCheck( String imgFile) {
 		try {
 			this.imgFile = DataAES.aesDecryption(imgFile, pl.getSecurityKey());
 			

@@ -138,8 +138,7 @@ public class Login { // 로그인 회원가입 관리
 					sql2 = "select * from user where id=? and name=?";
 					pstmt2 = conn.prepareStatement(sql2);
 					pstmt2.setString(1, id);
-					pstmt2.setString(2, pwd);
-					pstmt2.setString(3, name);
+					pstmt2.setString(2, name);
 					rs2 = pstmt2.executeQuery();
 					if (rs2.next()) { // 이미 회원가입이 되어 있을 때
 						returns = "acountAleadyExist";

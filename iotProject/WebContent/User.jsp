@@ -49,7 +49,16 @@
 	} else {
 		b_id = "";
 	}
-
+	if(type != null) {
+		type = xss.prevention(type);			
+	} else {
+		type = "";
+	}	
+	if(securityKey != null) {
+		securityKey = xss.prevention(securityKey);			
+	} else {
+		securityKey = "";
+	}
 	
 	PropLoad pl = new PropLoad(securityKey, type);
 	UserManager user = new UserManager(pl, name, id, pwd, mail, b_name, b_id);

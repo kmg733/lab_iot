@@ -33,17 +33,26 @@
 	} else {
 		pwd = "";
 	}	
-	if(name != null) {
+	if(b_pwd != null) {
 		b_pwd = xss.prevention(b_pwd);			
 	} else {
 		b_pwd = "";
 	}	
-	if(name != null) {
+	if(mail != null) {
 		mail = xss.prevention(mail);			
 	} else {
 		mail = "";
 	}	
-	
+	if(type != null) {
+		type = xss.prevention(type);			
+	} else {
+		type = "";
+	}	
+	if(securityKey != null) {
+		securityKey = xss.prevention(securityKey);			
+	} else {
+		securityKey = "";
+	}
 	
 	PropLoad pl = new PropLoad(securityKey, type);
 	LoginManager logm = new LoginManager(pl, name, id, pwd, b_pwd, mail);
