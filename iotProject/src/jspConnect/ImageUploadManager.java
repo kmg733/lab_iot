@@ -1,6 +1,5 @@
 package jspConnect;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -23,7 +22,6 @@ public class ImageUploadManager {
 	private String result;
 	
 	//	이미지 저장을 위한 파일경로 지정
-	private	File file = new File(".");
 	private String savePath = "C:/Users/securityLab_5/eclipse-worspace/IoT/WebContent/WEB-INF/upload/";
 	
 	

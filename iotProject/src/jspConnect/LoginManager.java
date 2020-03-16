@@ -40,7 +40,7 @@ public class LoginManager {
 		else if(pl.getType().equals("find")) {
 			findCheck(id, name, mail);
 		}
-		else if(pl.getType().equals("")) {
+		else if(pl.getType().equals("change")) {
 			changeCheck(id, pwd, b_pwd);
 		}
 		else {
