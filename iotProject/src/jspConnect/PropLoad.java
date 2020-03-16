@@ -34,7 +34,7 @@ public class PropLoad {
 				String rsaPrivatekey = props.getProperty("key");
 				if (rsaPrivatekey != null) {
 					this.securityKey = DataRSA.rsaDecryption(securityKey, rsaPrivatekey);
-					this.type = DataAES.aesDecryption(type, securityKey);
+					this.type = DataAES.aesDecryption(type, this.securityKey);
 				}
 				
 				
@@ -86,8 +86,5 @@ public class PropLoad {
 		return type;
 	}
 	
-	
-	
-	//props.load(new java.io.BufferedInputStream(fis));
 	
 }

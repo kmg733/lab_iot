@@ -21,6 +21,16 @@
 		} else {
 			text = "";
 		}	
+		if(type != null) {
+			type = xss.prevention(type);			
+		} else {
+			type = "";
+		}	
+		if(securityKey != null) {
+			securityKey = xss.prevention(securityKey);			
+		} else {
+			securityKey = "";
+		}	
 		
 		
 		PropLoad pl = new PropLoad(securityKey, type);

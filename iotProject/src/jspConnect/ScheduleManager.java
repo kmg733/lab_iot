@@ -122,7 +122,7 @@ public class ScheduleManager {
 			this.date = DataAES.aesDecryption(date, pl.getSecurityKey());
 
 			
-			result = sche.scheduleAdd(this.title, this.text, this.date);
+			result = sche.scheduleShow(this.title, this.date);
 			result = DataAES.aesEncryption(result,  pl.getSecurityKey());
 			
 			
