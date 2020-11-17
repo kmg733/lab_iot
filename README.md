@@ -3,7 +3,7 @@
 
 # 구현환경
 언어 - JAVA  
-DB - mariaDB  
+데이터베이스 - mariaDB  
 구현도구 - Eclipse, Android Studio 4.0.1  
 
 # 메소드 소개
