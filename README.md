@@ -3,8 +3,8 @@
 
 # 구현환경
 언어 - JAVA  
-데이터베이스 - mariaDB 10.5  
-구현도구 - Eclipse, Android Studio 4.0.1  
+데이터베이스 - mariaDB   
+구현도구 - Eclipse, Android Studio    
 
 # 메소드 소개
 ## DBConnect.DBConnector
