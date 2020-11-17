@@ -1,5 +1,5 @@
-# lab_iot
-공주대학교 컴퓨터공학부 네트워크보안연구실 팀프로젝트_2019
+# Kongju National University Network Security Lab IoT Team Project 2019
+공주대학교 컴퓨터공학부 네트워크보안연구실 IoT 팀프로젝트 2019
 
 # 구현환경
 언어 - JAVA  
