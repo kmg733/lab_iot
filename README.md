@@ -7,4 +7,12 @@
 구현도구 - Eclipse, Android Studio    
 
 # 메소드 소개
+## DBConnect.Conference
 ## DBConnect.DBConnector
+## DBConnect.EmailInfo
+## DBConnect.ImageUpload
+## DBConnect.Login
+## DBConnect.MemberState
+## DBConnect.Rule
+## DBConnect.Schedule
+## DBConnect.User
