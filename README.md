@@ -1,6 +1,5 @@
 # Kongju National University Network Security Lab Team Project 2019
-공주대학교 컴퓨터공학부 네트워크보안연구실 팀프로젝트 2019  
-IoT를 이용한 연구실 자동화 시스템
+공주대학교 컴퓨터공학부 네트워크보안연구실 팀프로젝트 2019 - IoT를 이용한 연구실 자동화 시스템
 
 # 구현환경
 언어 - JAVA  
